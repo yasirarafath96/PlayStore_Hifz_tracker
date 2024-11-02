@@ -11,6 +11,14 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 export default function Layout() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [resetConfirmationVisible, setResetConfirmationVisible] =
+    useState(false);
+
+  const handleResetProgress = () => {
+    // Your logic for resetting progress goes here
+    console.log("Progress reset!");
+    setResetConfirmationVisible(false);
+  };
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1 }}>
@@ -131,6 +139,37 @@ export default function Layout() {
             <View style={styles.modalItem}>
               <FontAwesome name="exchange" size={20} color="#28A745" />
               <Text style={styles.modalItemText}>Change Student</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* //////// */}
+
+      <Modal
+        visible={resetConfirmationVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setResetConfirmationVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              Are you sure you want to reset your progress?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={handleResetProgress}
+                style={styles.confirmButton}
+              >
+                <Text style={styles.buttonText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setResetConfirmationVisible(false)}
+                style={styles.cancelButton}
+              >
+                <Text style={styles.buttonText}>No</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
