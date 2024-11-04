@@ -1,105 +1,157 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import React, { useState } from "react";
-import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { PieChart } from "react-native-chart-kit";
-// import Modal from "./components/atoms/modals";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import DoughnutChart from "../components/atoms/doughnutChart";
+import Feather from "@expo/vector-icons/Feather";
+import BarGraph from "../components/atoms/barGraph";
+
+const screenWidth = Dimensions.get("window").width;
 
 const Dashboard = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
 
-  const data = [
-    {
-      name: "Completed",
-      population: 60,
-      color: "#28a745",
-      legendFontColor: "#fff",
-      legendFontSize: 15,
-    },
-    {
-      name: "Pending",
-      population: 40,
-      color: "#dc3545",
-      legendFontColor: "#fff",
-      legendFontSize: 15,
-    },
+  const overallHifz = [
+    { value: 20, color: "green" },
+    { value: 80, color: "grey" },
+  ];
+  const currentJuzz = [
+    { value: 68, color: "green" },
+    { value: 32, color: "grey" },
+  ];
+  const customProgress = [
+    20,
+    30,
+    80,
+    85,
+    0, // Keep the first 20%
+    0,
+    0,
+    0,
+    0,
+    0, // Fill in with zeros
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, // Fill in more zeros to reach a total of 30
+    0,
+    0,
+    0,
+    0, // More zeros
+    0,
+    0,
+    0,
+    0, // Fill in more zeros to reach the end
+    0,
+    30,
+    0,
+    0,
+    10,
+    10, // Keep the last 30% value and rest as zeros
   ];
 
   return (
-    <>
-      <SafeAreaView style={styles.safeArea}>
-
-        <View style={styles.body}>
-          <View style={styles.chartContainer}>
-            <PieChart
-              data={data}
-              width={350}
-              height={200}
-              chartConfig={{
-                backgroundColor: "#ffffff",
-                backgroundGradientFrom: "#ffffff",
-                backgroundGradientTo: "#ffffff",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  marginVertical: 8,
-                  borderRadius: 0,
-                },
-              }}
-              accessor="population"
-              style={{
-                margin: 15,
-                borderRadius: 16,
-              }}
-            />
-            <PieChart
-              data={data}
-              width={350}
-              height={200}
-              chartConfig={{
-                backgroundColor: "#ffffff",
-                backgroundGradientFrom: "#ffffff",
-                backgroundGradientTo: "#ffffff",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  marginVertical: 8,
-                  borderRadius: 0,
-                },
-              }}
-              accessor="population"
-              style={{
-                margin: 10,
-                borderRadius: 0,
-              }}
-            />
-          </View>
+    <View style={styles.container}>
+      <View style={styles.chartContainer}>
+        <View style={styles.chartWrapper}>
+          <Text style={styles.chartHeaderText}>Overall Hifz</Text>
+          <DoughnutChart data={overallHifz} />
         </View>
-      </SafeAreaView>
-      <Modal visible={modalVisible} onClose={() => setModalVisible(false)} />
-    </>
+        <View style={styles.chartWrapper}>
+          <Text style={styles.chartHeaderText}>Current Juzz</Text>
+          <DoughnutChart data={currentJuzz} />
+        </View>
+      </View>
+      <View style={styles.percentageContainer}>
+        <View style={styles.percentageItem}>
+          <Text style={styles.percentageText}>{overallHifz[0].value}%</Text>
+        </View>
+        <View style={[styles.percentageItem, { flexDirection: "row" }]}>
+          <Text style={[styles.percentageText, { marginRight: 10 }]}>
+            {currentJuzz[0].value}%
+          </Text>
+          <TouchableOpacity onPress={() => setVisibleModal(true)}>
+            <Feather name="edit" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.progressContainer}>
+        <Text style={styles.progressHeader}>Para Progress</Text>
+      </View>
+      <View style={styles.barGraphContainer}>
+        <BarGraph progress={customProgress} />
+      </View>
+    </View>
   );
 };
 
 export default Dashboard;
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
-  },
-  
-  body: {
-    flex: 1,
-    padding: 0,
-    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'orange',
+    backgroundColor: "white",
   },
   chartContainer: {
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  chartWrapper: {
+    width: "48%",
+    backgroundColor: "lightgrey",
+    padding: 10,
+    borderRadius: 10,
+    height: 240,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    elevation: 10,
+  },
+  chartHeaderText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  percentageContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    marginTop: 20,
+    width: "100%",
+    paddingHorizontal: 10,
+  },
+  percentageItem: {
+    width: "50%",
+    justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+  },
+  percentageText: {
+    fontSize: 18,
+    color: "#333",
+  },
+  progressContainer: {
+    alignSelf: 'flex-start', // Align left
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    width: '100%',
+  },
+  progressHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginTop: 10,
+  },
+  barGraphContainer: {
+    width: "100%",
+    paddingHorizontal: 5 
   },
 });
