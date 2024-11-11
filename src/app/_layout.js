@@ -16,12 +16,16 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Stack } from "expo-router";
+import { Portal, Button, PaperProvider } from 'react-native-paper';
+import ProfileModal from "../components/molecules/ProfileModal";
+import AddStudentModal from "../components/molecules/AddStudentModal";
+
 
 export default function Layout() {
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [resetConfirmationVisible, setResetConfirmationVisible] =
     useState(false);
-  const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
+  // const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
   const [studentName, setStudentName] = useState("");
   const [students, setStudents] = useState([]);
   const [removeStudentModalVisible, setRemoveStudentModalVisible] =
@@ -30,6 +34,9 @@ export default function Layout() {
   const [switchStudentModalVisible, setSwitchStudentModalVisible] =
     useState(false);
   const [currentStudent, setCurrentStudent] = useState("");
+
+  const [profileModal, setProfileModal] = useState(false);
+  const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
 
   const handleSaveStudent = () => {
     if (studentName.trim()) {
@@ -70,7 +77,8 @@ export default function Layout() {
               headerRight: () => (
                 <TouchableOpacity
                   style={{ marginRight: 15 }}
-                  onPress={() => setModalVisible(true)}
+                  // onPress={() => setModalVisible(true)}
+                  onPress={() => setProfileModal(true)}
                 >
                   <FontAwesome name="user" size={24} color="black" />
                 </TouchableOpacity>
@@ -147,7 +155,7 @@ export default function Layout() {
       </GestureHandlerRootView>
 
       {/* Open Account */}
-      <Modal
+      {/* <Modal
         visible={modalVisible}
         animationType="fade"
         transparent={true}
@@ -196,7 +204,7 @@ export default function Layout() {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* Reset Details */}
       <Modal
@@ -229,7 +237,7 @@ export default function Layout() {
       </Modal>
 
       {/* Add Student */}
-      <Modal
+      {/* <Modal
         visible={addStudentModalVisible}
         animationType="fade"
         transparent={true}
@@ -260,7 +268,7 @@ export default function Layout() {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* Remove Student */}
       <Modal
@@ -350,6 +358,15 @@ export default function Layout() {
           </View>
         </View>
       </Modal>
+
+      {/* Open  */}
+      {profileModal && <ProfileModal visible={profileModal} onClose={() => setProfileModal(false)} />}
+
+      <AddStudentModal
+        visible={addStudentModalVisible}
+        setAddStudentModalVisible={setAddStudentModalVisible}
+        handleSaveStudent={handleSaveStudent}
+      />
     </>
   );
 }
