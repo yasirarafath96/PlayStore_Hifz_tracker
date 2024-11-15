@@ -1,47 +1,50 @@
-import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import React, { useState } from "react";
-import { Picker } from "@react-native-picker/picker";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import { TextInput } from "react-native-paper";
+import SurahList from "../data/SurahList";
+import QuranPage from "../data/QuranPage";
 
 const UpdateProgram = () => {
-  const [selectedValue, setSelectedValue] = useState("1");
+  const [pageNumber, setPageNumber] = useState("1");
+  const [selectedPage, setSelectedPage] = useState(null);
 
-  const handleUpdate = () => {
-    Alert.alert("Update", `You have selected: ${selectedValue}`);
-  };
-
-  const handleCancel = () => {
-    Alert.alert("Cancelled", "Update has been cancelled.");
+  const handleShowPage = () => {
+    if (!pageNumber || isNaN(pageNumber) || pageNumber < 1 || pageNumber > 604) {
+      alert("Please enter a valid page number (1-604).");
+      return;
+    }
+    setSelectedPage(pageNumber); // Set the selected page to fetch
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <View style={{ flexDirection: "row", alignItems: 'center', height: 200 }}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Select Juzz:</Text>
-          </View>
-          <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={selectedValue}
-              style={styles.picker}
-              onValueChange={(itemValue) => setSelectedValue(itemValue)}
-            >
-              {Array.from({ length: 30 }, (_, i) => (
-                <Picker.Item key={i} label={`${i + 1}`} value={`${i + 1}`} />
-              ))}
-            </Picker>
-          </View>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleCancel}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.container}>
+      {/* Page Input */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Enter Page Number:</Text>
+        <TextInput
+          mode="outlined"
+          placeholder="Enter a page number (1-604)"
+          keyboardType="numeric"
+          value={pageNumber}
+          onChangeText={(text) => setPageNumber(text)}
+          style={styles.textInput}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleShowPage}>
+          <Text style={styles.buttonText}>Show Page</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Surah List */}
+      {/* <SurahList /> */}
+
+      {/* Quran Page */}
+      {selectedPage && <QuranPage pageNumber={selectedPage} />}
     </SafeAreaView>
   );
 };
@@ -52,41 +55,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 15,
-    justifyContent: "center", // Center content vertically
+    padding: 15,
   },
-  header: {
-    height: 50,
-    justifyContent: "center",
+  inputContainer: {
+    marginBottom: 20,
   },
-  headerText: {
+  label: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 5,
   },
-  dropdownContainer: {
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 5,
-    overflow: "hidden",
-    width: 150,
-    marginHorizontal: 15,
-  },
-  picker: {
-    height: 50,
-    width: "100%",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20, // Space above buttons
+  textInput: {
+    marginBottom: 10,
   },
   button: {
-    flex: 1,
-    backgroundColor: "#007BFF", // Button color
+    backgroundColor: "#007BFF",
     paddingVertical: 10,
     borderRadius: 5,
-    marginHorizontal: 5, // Space between buttons
     alignItems: "center",
   },
   buttonText: {

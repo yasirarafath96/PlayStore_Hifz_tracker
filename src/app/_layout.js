@@ -207,7 +207,7 @@ export default function Layout() {
       </Modal> */}
 
       {/* Reset Details */}
-      <Modal
+      {/* <Modal
         visible={resetConfirmationVisible}
         animationType="fade"
         transparent={true}
@@ -234,7 +234,7 @@ export default function Layout() {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* Add Student */}
       {/* <Modal
@@ -271,7 +271,7 @@ export default function Layout() {
       </Modal> */}
 
       {/* Remove Student */}
-      <Modal
+      {/* <Modal
         visible={removeStudentModalVisible}
         animationType="fade"
         transparent={true}
@@ -322,10 +322,10 @@ export default function Layout() {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* Switch Student */}
-      <Modal
+      {/* <Modal
         visible={switchStudentModalVisible}
         animationType="fade"
         transparent={true}
@@ -357,16 +357,16 @@ export default function Layout() {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
 
       {/* Open  */}
-      {profileModal && <ProfileModal visible={profileModal} onClose={() => setProfileModal(false)} />}
+      {/* {profileModal && <ProfileModal visible={profileModal} onClose={() => setProfileModal(false)} />} */}
 
-      <AddStudentModal
+      {/* <AddStudentModal
         visible={addStudentModalVisible}
         setAddStudentModalVisible={setAddStudentModalVisible}
         handleSaveStudent={handleSaveStudent}
-      />
+      /> */}
     </>
   );
 }

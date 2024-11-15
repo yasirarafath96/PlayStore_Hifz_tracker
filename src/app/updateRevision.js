@@ -1,18 +1,24 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
+import axios from "axios";
 
 const UpdateRevision = () => {
-  const [selectedValue, setSelectedValue] = useState("1");
-
-  // Sample data for the table
-  const initialData = [
+  const [selectedJuz, setSelectedJuz] = useState("30");
+  const [selectedSurah, setSelectedSurah] = useState("");
+  const [selectedPage, setSelectedPage] = useState("");
+  const [surahs, setSurahs] = useState([]);
+  const [pages, setPages] = useState([]);
+  const [data, setData] = useState([
     { surah: "Al-Fatiha", page: 1, mistakes: "0" },
-    { surah: "Al-Baqarah", page: 2, mistakes: "0" },
-    { surah: "Al-Imran", page: 3, mistakes: "0" },
-  ];
-
-  const [data, setData] = useState(initialData);
+  ]);
 
   const getDotColor = (mistakes) => {
     if (mistakes === "0") return "green";
@@ -20,32 +26,126 @@ const UpdateRevision = () => {
     return "red";
   };
 
-  const handleMistakesChange = (index, value) => {
-    const newData = [...data];
-    newData[index].mistakes = value;
-    setData(newData);
+  const handleJuzChange = async (juz) => {
+    setSelectedJuz(juz);
+    setSelectedSurah("");
+    setSelectedPage("");
+    setSurahs([]);
+    setPages([]);
+    try {
+      const response = await axios.get(
+        `http://api.alquran.cloud/v1/juz/${juz}/en.asad`
+      );
+      const ayahs = response.data.data.ayahs;
+
+      const uniqueSurahs = Array.from(
+        new Set(ayahs.map((ayah) => ayah.surah.englishName))
+      );
+      setSurahs(uniqueSurahs);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to fetch Surahs for the selected Juz.");
+    }
   };
+
+  const handleSurahChange = async (surah) => {
+    setSelectedSurah(surah);
+    setSelectedPage("");
+    setPages([]);
+    try {
+      const response = await axios.get(
+        `http://api.alquran.cloud/v1/juz/${selectedJuz}/en.asad`
+      );
+      const ayahs = response.data.data.ayahs;
+
+      const filteredPages = Array.from(
+        new Set(
+          ayahs
+            .filter((ayah) => ayah.surah.englishName === surah)
+            .map((ayah) => ayah.page)
+        )
+      );
+      setPages(filteredPages);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to fetch pages for the selected Surah.");
+    }
+  };
+
+  const handleAddRow = () => {
+    if (!selectedJuz || !selectedSurah || !selectedPage) {
+      Alert.alert("Error", "Please select Juz, Surah, and Page.");
+      return;
+    }
+
+    const newRow = {
+      surah: selectedSurah,
+      page: parseInt(selectedPage),
+      mistakes: "0", 
+    };
+
+    setData((prevData) => [...prevData, newRow]);
+    Alert.alert("Success", "Record added successfully!");
+  };
+
+  const handleMistakeChange = (index, value) => {
+    const updatedData = [...data];
+    updatedData[index].mistakes = value;
+    setData(updatedData);
+  };
+
+  console.log(data)
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <View style={{ flexDirection: "row", alignItems: "center", height: 60 }}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Select Juzz:</Text>
-          </View>
-          <View style={styles.dropdownContainer}>
-            <Picker
-              selectedValue={selectedValue}
-              style={styles.picker}
-              onValueChange={(itemValue) => setSelectedValue(itemValue)}
-            >
-              {Array.from({ length: 30 }, (_, i) => (
-                <Picker.Item key={i} label={`${i + 1}`} value={`${i + 1}`} />
-              ))}
-            </Picker>
-          </View>
+        {/* Input Section */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Select Juz:</Text>
+          <Picker
+            selectedValue={selectedJuz}
+            style={styles.picker}
+            onValueChange={(itemValue) => handleJuzChange(itemValue)}
+          >
+            {Array.from({ length: 30 }, (_, i) => (
+              <Picker.Item key={i} label={`${i + 1}`} value={`${i + 1}`} />
+            ))}
+          </Picker>
+
+          {surahs.length > 0 && (
+            <>
+              <Text style={styles.label}>Select Surah:</Text>
+              <Picker
+                selectedValue={selectedSurah}
+                style={styles.picker}
+                onValueChange={(itemValue) => handleSurahChange(itemValue)}
+              >
+                {surahs.map((surah, index) => (
+                  <Picker.Item key={index} label={surah} value={surah} />
+                ))}
+              </Picker>
+            </>
+          )}
+
+          {pages.length > 0 && (
+            <>
+              <Text style={styles.label}>Select Page:</Text>
+              <Picker
+                selectedValue={selectedPage}
+                style={styles.picker}
+                onValueChange={(itemValue) => setSelectedPage(itemValue)}
+              >
+                {pages.map((page, index) => (
+                  <Picker.Item key={index} label={`${page}`} value={`${page}`} />
+                ))}
+              </Picker>
+            </>
+          )}
+
+          <TouchableOpacity style={styles.button} onPress={handleAddRow}>
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.updatedText}>Updated Juzz: {selectedValue}</Text>
 
         {/* Custom Table */}
         <View style={styles.table}>
@@ -61,14 +161,17 @@ const UpdateRevision = () => {
               <View style={styles.mistakesContainer}>
                 <Picker
                   selectedValue={item.mistakes}
-                  style={styles.picker}
-                  onValueChange={(itemValue) => handleMistakesChange(index, itemValue)}
+                  style={styles.mistakesPicker}
+                  onValueChange={(value) => handleMistakeChange(index, value)}
                 >
                   <Picker.Item label="0" value="0" />
-                  <Picker.Item label="1 or 2" value="1" />
-                  <Picker.Item label="3 or more" value="3" />
+                  <Picker.Item label="1" value="1" />
+                  <Picker.Item label="2" value="2" />
+                  <Picker.Item label="3" value="3" />
                 </Picker>
-                <View style={[styles.dot, { backgroundColor: getDotColor(item.mistakes) }]} />
+                <View
+                  style={[styles.dot, { backgroundColor: getDotColor(item.mistakes) }]}
+                />
               </View>
             </View>
           ))}
@@ -84,32 +187,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 15,
-    justifyContent: "center", 
+    padding: 15,
   },
-  header: {
-    height: 50,
-    justifyContent: "center",
+  inputContainer: {
+    marginBottom: 20,
   },
-  headerText: {
+  label: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  dropdownContainer: {
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 0,
-    overflow: "hidden",
-    width: 150,
-    marginHorizontal: 15,
+    marginBottom: 5,
   },
   picker: {
-    height: 40,
-    width: 100,
+    height: 50,
+    width: "100%",
+    marginBottom: 10,
   },
-  updatedText: {
-    marginTop: 10,
+  button: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -144,7 +244,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: 140,
+    width: 150,
   },
   dot: {
     width: 10,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -36,75 +35,60 @@ const ProfileModal = ({ visible, onClose }) => {
 
   const handleSaveStudent = (studentName) => {
     console.log("Student Saved:", studentName);
-    // Here, you would typically save the student name to your state or a database
-    setAddStudentModalVisible(false); // Close the modal after saving the student
+    setAddStudentModalVisible(false);
   };
 
   const handleAddStudentPress = () => {
-    setAddStudentModalVisible(true); // Open AddStudentModal
-    // onClose(); // Close ProfileModal
+    setAddStudentModalVisible(true);
   };
 
   return (
     <>
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.centeredView}>
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={visible}
-            onRequestClose={onClose}
-          >
-            <View style={styles.centeredView}>
-              <Animated.View
-                style={[
-                  styles.modalView,
-                  { transform: [{ translateX: slideAnim }] },
-                ]}
+      {visible && (
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.centeredView}>
+            <Animated.View
+              style={[
+                styles.modalView,
+                { transform: [{ translateX: slideAnim }] },
+              ]}
+            >
+              {/* Modal Header */}
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalText}>Student</Text>
+                <TouchableOpacity onPress={onClose}>
+                  <Fontisto name="close-a" size={18} color="#FF6347" />
+                </TouchableOpacity>
+              </View>
+
+              {/* Modal Items */}
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={handleAddStudentPress}
               >
-                {/* Modal Header */}
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalText}>Student</Text>
-                  <TouchableOpacity onPress={onClose}>
-                    <Fontisto name="close-a" size={18} color="#FF6347" />
-                  </TouchableOpacity>
-                </View>
+                <FontAwesome6 name="add" size={20} color="#007BFF" />
+                <Text style={styles.modalItemText}>Add Student</Text>
+              </TouchableOpacity>
 
-                {/* Modal Items */}
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={handleAddStudentPress} // Close ProfileModal and open AddStudentModal
-                >
-                  <FontAwesome6 name="add" size={20} color="#007BFF" />
-                  <Text style={styles.modalItemText}>Add Student</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={onClose}
+              >
+                <Ionicons name="remove-outline" size={18} color="#FF6347" />
+                <Text style={styles.modalItemText}>Remove Student</Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    onClose();
-                    // Add your action for Remove Student
-                  }}
-                >
-                  <Ionicons name="remove-outline" size={18} color="#FF6347" />
-                  <Text style={styles.modalItemText}>Remove Student</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    onClose();
-                    // Add your action for Switch Student
-                  }}
-                >
-                  <FontAwesome name="exchange" size={20} color="#28A745" />
-                  <Text style={styles.modalItemText}>Switch Student</Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-          </Modal>
-        </SafeAreaView>
-      </SafeAreaProvider>
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={onClose}
+              >
+                <FontAwesome name="exchange" size={20} color="#28A745" />
+                <Text style={styles.modalItemText}>Switch Student</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      )}
 
       {/* AddStudentModal */}
       <AddStudentModal
@@ -119,14 +103,15 @@ const ProfileModal = ({ visible, onClose }) => {
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: "flex-start", // Align at the top
-    alignItems: "flex-end", // Align to the right side
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-    position: "absolute", // Position absolutely on the screen
-    top: 0, // Align to the top of the screen
-    right: 0, // Align to the right of the screen
-    width: "100%", // Take full width of the screen
-    height: "100%", // Take full height of the screen
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    // backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: 'transparent',
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: "100%",
+    height: "100%",
   },
   modalView: {
     margin: 20,
@@ -155,7 +140,7 @@ const styles = StyleSheet.create({
   },
   modalItem: {
     flexDirection: "row",
-    justifyContent: "space-between", // Distribute space between icon and text
+    justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 15,
