@@ -19,7 +19,7 @@ const UpdateProgram = () => {
       alert("Please enter a valid page number (1-604).");
       return;
     }
-    setSelectedPage(pageNumber); // Set the selected page to fetch
+    setSelectedPage(pageNumber); 
   };
 
   return (
@@ -41,7 +41,7 @@ const UpdateProgram = () => {
       </View>
 
       {/* Surah List */}
-      {/* <SurahList /> */}
+      <SurahList />
 
       {/* Quran Page */}
       {selectedPage && <QuranPage pageNumber={selectedPage} />}

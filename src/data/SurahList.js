@@ -19,7 +19,7 @@ const SurahList = () => {
       try {
         const response = await axios.get("https://api.alquran.cloud/v1/surah");
         setSurahs(response.data.data);
-        console.log(response.data.data)
+        console.log("Surah List->>>>", response.data.data)
       } catch (error) {
         console.error("Error fetching Surah data:", error);
       } finally {
@@ -30,7 +30,6 @@ const SurahList = () => {
     fetchSurahs();
   }, []);
 
-  // Render each item in the FlatList
   const renderSurah = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.title}>{item.name}</Text>

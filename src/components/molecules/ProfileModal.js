@@ -45,7 +45,6 @@ const ProfileModal = ({ visible, onClose }) => {
   return (
     <>
       {visible && (
-        <SafeAreaProvider>
           <SafeAreaView style={styles.centeredView}>
             <Animated.View
               style={[
@@ -87,7 +86,6 @@ const ProfileModal = ({ visible, onClose }) => {
               </TouchableOpacity>
             </Animated.View>
           </SafeAreaView>
-        </SafeAreaProvider>
       )}
 
       {/* AddStudentModal */}

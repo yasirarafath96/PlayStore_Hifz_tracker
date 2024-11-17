@@ -81,7 +81,7 @@ const UpdateRevision = () => {
     const newRow = {
       surah: selectedSurah,
       page: parseInt(selectedPage),
-      mistakes: "0", 
+      mistakes: "0",
     };
 
     setData((prevData) => [...prevData, newRow]);
@@ -94,7 +94,7 @@ const UpdateRevision = () => {
     setData(updatedData);
   };
 
-  console.log(data)
+  console.log(data);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -136,7 +136,11 @@ const UpdateRevision = () => {
                 onValueChange={(itemValue) => setSelectedPage(itemValue)}
               >
                 {pages.map((page, index) => (
-                  <Picker.Item key={index} label={`${page}`} value={`${page}`} />
+                  <Picker.Item
+                    key={index}
+                    label={`${page}`}
+                    value={`${page}`}
+                  />
                 ))}
               </Picker>
             </>
@@ -160,7 +164,7 @@ const UpdateRevision = () => {
               <Text style={styles.tableCell}>{item.page}</Text>
               <View style={styles.mistakesContainer}>
                 <Picker
-                  selectedValue={item.mistakes}
+                  selectedValue={item.mistakes || "0"} // Ensure default value is "0"
                   style={styles.mistakesPicker}
                   onValueChange={(value) => handleMistakeChange(index, value)}
                 >
@@ -170,7 +174,10 @@ const UpdateRevision = () => {
                   <Picker.Item label="3" value="3" />
                 </Picker>
                 <View
-                  style={[styles.dot, { backgroundColor: getDotColor(item.mistakes) }]}
+                  style={[
+                    styles.dot,
+                    { backgroundColor: getDotColor(item.mistakes || "0") },
+                  ]} // Use "0" if item.mistakes is undefined
                 />
               </View>
             </View>

@@ -271,7 +271,7 @@ export default function Layout() {
       </Modal> */}
 
       {/* Remove Student */}
-      {/* <Modal
+      <Modal
         visible={removeStudentModalVisible}
         animationType="fade"
         transparent={true}
@@ -322,7 +322,7 @@ export default function Layout() {
             </View>
           </View>
         </View>
-      </Modal> */}
+      </Modal>
 
       {/* Switch Student */}
       {/* <Modal
@@ -360,7 +360,7 @@ export default function Layout() {
       </Modal> */}
 
       {/* Open  */}
-      {/* {profileModal && <ProfileModal visible={profileModal} onClose={() => setProfileModal(false)} />} */}
+      {profileModal && <ProfileModal visible={profileModal} onClose={() => setProfileModal(false)} />}
 
       {/* <AddStudentModal
         visible={addStudentModalVisible}
