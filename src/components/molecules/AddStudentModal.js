@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent }) => {
+const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent, student }) => {
   const [studentName, setStudentName] = useState("");
 
   return (
@@ -26,10 +26,7 @@ const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent
           {/* Button Container */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              onPress={() => {
-                handleSaveStudent(studentName);
-                setStudentName(""); // Clear input field after save
-              }}
+             
               style={styles.confirmButton}
             >
               <Text style={styles.buttonText}>Save</Text>

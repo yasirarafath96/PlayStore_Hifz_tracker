@@ -13,11 +13,18 @@ import {
   Fontisto,
 } from "@expo/vector-icons";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import AddStudentModal from "./AddStudentModal";
+import AddStudent from "./AddStudentModal";
+import RemoveStudent from "./RemoveStudent";
+import SwitchStudent from "./SwitchStudentModal";
 
 const ProfileModal = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(300));
+  const [students, setStudents] = useState(["asdf", "asddfdfd"]);
   const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
+  const [removeStudentModalVisible, setRemoveStudentModalVisible] =
+    useState(false);
+  const [switchStudentModalVisible, setSwitchStudentModalVisible] =
+    useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -41,58 +48,76 @@ const ProfileModal = ({ visible, onClose }) => {
   const handleAddStudentPress = () => {
     setAddStudentModalVisible(true);
   };
+  const handleRemoveStudentPress = () => {
+    setRemoveStudentModalVisible(true);
+  };
+  const handleSwitchStudentPress = () => {
+    setSwitchStudentModalVisible(true);
+  };
 
   return (
     <>
       {visible && (
-          <SafeAreaView style={styles.centeredView}>
-            <Animated.View
-              style={[
-                styles.modalView,
-                { transform: [{ translateX: slideAnim }] },
-              ]}
+        <SafeAreaView style={styles.centeredView}>
+          <Animated.View
+            style={[
+              styles.modalView,
+              { transform: [{ translateX: slideAnim }] },
+            ]}
+          >
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalText}>Student</Text>
+              <TouchableOpacity onPress={onClose}>
+                <Fontisto name="close-a" size={18} color="#FF6347" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Modal Items */}
+            <TouchableOpacity
+              style={styles.modalItem}
+              onPress={handleAddStudentPress}
             >
-              {/* Modal Header */}
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalText}>Student</Text>
-                <TouchableOpacity onPress={onClose}>
-                  <Fontisto name="close-a" size={18} color="#FF6347" />
-                </TouchableOpacity>
-              </View>
+              <FontAwesome6 name="add" size={20} color="#007BFF" />
+              <Text style={styles.modalItemText}>Add Student</Text>
+            </TouchableOpacity>
 
-              {/* Modal Items */}
-              <TouchableOpacity
-                style={styles.modalItem}
-                onPress={handleAddStudentPress}
-              >
-                <FontAwesome6 name="add" size={20} color="#007BFF" />
-                <Text style={styles.modalItemText}>Add Student</Text>
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalItem}
+              onPress={handleRemoveStudentPress}
+            >
+              <Ionicons name="remove-outline" size={18} color="#FF6347" />
+              <Text style={styles.modalItemText}>Remove Student</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.modalItem}
-                onPress={onClose}
-              >
-                <Ionicons name="remove-outline" size={18} color="#FF6347" />
-                <Text style={styles.modalItemText}>Remove Student</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.modalItem}
-                onPress={onClose}
-              >
-                <FontAwesome name="exchange" size={20} color="#28A745" />
-                <Text style={styles.modalItemText}>Switch Student</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </SafeAreaView>
+            <TouchableOpacity
+              style={styles.modalItem}
+              onPress={handleSwitchStudentPress}
+            >
+              <FontAwesome name="exchange" size={20} color="#28A745" />
+              <Text style={styles.modalItemText}>Switch Student</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </SafeAreaView>
       )}
 
-      {/* AddStudentModal */}
-      <AddStudentModal
+      <AddStudent
         visible={addStudentModalVisible}
         setAddStudentModalVisible={setAddStudentModalVisible}
         handleSaveStudent={handleSaveStudent}
+        students={students}
+      />
+
+      <RemoveStudent
+        visible={removeStudentModalVisible}
+        setRemoveStudentModalVisible={setRemoveStudentModalVisible}
+        students={students}
+      />
+      <SwitchStudent
+        visible={switchStudentModalVisible}
+        setSwitchStudentModalVisible={setSwitchStudentModalVisible}
+        handleSwitchStudent={handleSwitchStudentPress}
+        students={students}
       />
     </>
   );
@@ -104,7 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-end",
     // backgroundColor: "rgba(0, 0, 0, 0.5)",
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     position: "absolute",
     top: 0,
     right: 0,
