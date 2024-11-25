@@ -6,19 +6,26 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import axios from "axios";
+import axios, { Axios } from "axios";
+import { Surah } from '../../constants/Surah';
+import surahjson from '../../constants/surah.json'
 
 const UpdateRevision = () => {
   const [selectedJuz, setSelectedJuz] = useState("30");
-  const [selectedSurah, setSelectedSurah] = useState("");
+  const [selectedSurah, setSelectedSurah] = useState(0);
   const [selectedPage, setSelectedPage] = useState("");
   const [surahs, setSurahs] = useState([]);
   const [pages, setPages] = useState([]);
   const [data, setData] = useState([
     { surah: "Al-Fatiha", page: 1, mistakes: "0" },
   ]);
+
+  const [metaData, setMetaData] = useState(null);
+
+  // console.log("surahs of quran",  surah)
+
 
   const getDotColor = (mistakes) => {
     if (mistakes === "0") return "green";
@@ -53,10 +60,14 @@ const UpdateRevision = () => {
     setSelectedPage("");
     setPages([]);
     try {
+      const quran = await axios.get(`https://api.alquran.cloud/v1/meta`);
       const response = await axios.get(
         `http://api.alquran.cloud/v1/juz/${selectedJuz}/en.asad`
       );
+      const surah = quran.data;
       const ayahs = response.data.data.ayahs;
+
+      console.log("surah -----",surah)
 
       const filteredPages = Array.from(
         new Set(
@@ -94,8 +105,31 @@ const UpdateRevision = () => {
     setData(updatedData);
   };
 
-  console.log(data);
+  // console.log(data);
 
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get("https://api.alquran.cloud/v1/meta");
+  //     console.log("Full API Response:", response); // Log the entire response object
+  //     const data = response.data;
+  //     setMetaData(data); // Store the data in state
+  //   } catch (error) {
+  //     console.error("Error fetching Quran metadata:", error.message);
+  //     if (error.response) {
+  //       console.error("Response Error:", error.response.data);
+  //     } else if (error.request) {
+  //       console.error("No Response from Server:", error.request);
+  //     } else {
+  //       console.error("Request Error:", error.message);
+  //     }
+  //   }
+  // };
+  
+  useEffect(() => {
+    console.log("surahjson",  surahjson[selectedSurah])
+
+  }, []);
+  
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

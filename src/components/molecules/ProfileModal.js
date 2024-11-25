@@ -19,12 +19,14 @@ import SwitchStudent from "./SwitchStudentModal";
 
 const ProfileModal = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(300));
-  const [students, setStudents] = useState(["asdf", "asddfdfd"]);
+  const [students, setStudents] = useState(["Yasir"]);
   const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
   const [removeStudentModalVisible, setRemoveStudentModalVisible] =
     useState(false);
   const [switchStudentModalVisible, setSwitchStudentModalVisible] =
     useState(false);
+
+  console.log("students", students);
 
   useEffect(() => {
     if (visible) {
@@ -67,7 +69,7 @@ const ProfileModal = ({ visible, onClose }) => {
           >
             {/* Modal Header */}
             <View style={styles.modalHeader}>
-              <Text style={styles.modalText}>Student</Text>
+              <Text style={styles.modalText}>{students[0]}</Text>
               <TouchableOpacity onPress={onClose}>
                 <Fontisto name="close-a" size={18} color="#FF6347" />
               </TouchableOpacity>

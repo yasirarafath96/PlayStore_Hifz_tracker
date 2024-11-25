@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button } from "react-native-paper";
 
 const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent, student }) => {
   const [studentName, setStudentName] = useState("");
@@ -25,19 +26,25 @@ const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent
 
           {/* Button Container */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-             
-              style={styles.confirmButton}
+            <Button
+              mode="contained"
+              buttonColor="#28A745"
+              labelStyle={styles.buttonText}
+              style={styles.button}
+              onPress={() => handleSaveStudent(studentName)}
             >
-              <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
+              Save
+            </Button>
 
-            <TouchableOpacity
-              onPress={() => {setAddStudentModalVisible(false); }}
-              style={styles.cancelButton}
+            <Button
+              mode="contained"
+              buttonColor="#FF6347"
+              labelStyle={styles.buttonText}
+              style={styles.button}
+              onPress={() => setAddStudentModalVisible(false)}
             >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
+              Cancel
+            </Button>
           </View>
         </View>
       </View>
@@ -59,6 +66,7 @@ const styles = StyleSheet.create({
   },
   content: {
     width: 300,
+    height: 300,
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
@@ -80,31 +88,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 10,
   },
-  confirmButton: {
-    backgroundColor: "#28A745",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    flex: 1,
-    marginRight: 10,
-  },
-  cancelButton: {
-    backgroundColor: "#FF6347",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    flex: 1,
+  button: {
+    width: "80%",
+    marginVertical: 2,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
-    textAlign: "center",
   },
 });
 
