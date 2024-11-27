@@ -9,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import axios, { Axios } from "axios";
-import { Surah } from '../../constants/Surah';
 import surahjson from '../../constants/surah.json'
 
 const UpdateRevision = () => {
