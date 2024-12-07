@@ -3,8 +3,8 @@ import { View, Text } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
 const DoughnutChart = ({ data }) => {
-  const outerRadius = 80;  // Outer radius of the doughnut
-  const innerRadius = 25;    // Inner radius of the doughnut
+  const outerRadius = 75;  // Outer radius of the doughnut
+  const innerRadius = 20;    // Inner radius of the doughnut
   const total = data.reduce((sum, { value }) => sum + value, 0);
   let cumulativeValue = 0;
 

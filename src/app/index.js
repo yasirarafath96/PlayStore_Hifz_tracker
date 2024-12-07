@@ -14,14 +14,16 @@ const screenWidth = Dimensions.get("window").width;
 
 const Dashboard = () => {
   const [visibleModal, setVisibleModal] = useState(false);
+  const [overallPercent, setOverallPercent] = useState(40);
+  const [currentPercent, setCurrentPercent] = useState(1);
 
   const overallHifz = [
-    { value: 20, color: "green" },
-    { value: 80, color: "grey" },
+    { value: overallPercent, color: "green" },
+    { value: 100 - overallPercent, color: "grey" },
   ];
   const currentJuzz = [
-    { value: 68, color: "green" },
-    { value: 32, color: "grey" },
+    { value: currentPercent, color: "green" },
+    { value: 100 - currentPercent, color: "grey" },
   ];
   const customProgress = [
     20,

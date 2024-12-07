@@ -5,92 +5,124 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ScrollView,
+  ScrollView
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import pages from "../../constants/pages.json";
 import rukus from "../../constants/rukus.json";
 import surah from "../..//constants/surah.json";
 import juzzs from "../../constants/juzzs.json";
-import { TextInput } from "react-native-paper";
-import { z } from 'zod';
+import Surahinpara from "../../constants/SurahInPara.json";
+import { Button, TextInput } from "react-native-paper";
+import { z } from "zod";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UpdateProgram = () => {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState();
+  const [filterPara, setFilterPara] = useState();
+
+  const data = [
+    { "para": 1, "pages": 20 },
+    { "para": 2, "pages": 22 },
+    { "para": 3, "pages": 24 },
+    { "para": 4, "pages": 26 },
+    { "para": 5, "pages": 24 },
+    { "para": 6, "pages": 24 },
+    { "para": 7, "pages": 26 },
+    { "para": 8, "pages": 24 },
+    { "para": 9, "pages": 26 },
+    { "para": 10, "pages": 22 },
+    { "para": 11, "pages": 24 },
+    { "para": 12, "pages": 24 },
+    { "para": 13, "pages": 24 },
+    { "para": 14, "pages": 24 },
+    { "para": 15, "pages": 24 },
+    { "para": 16, "pages": 24 },
+    { "para": 17, "pages": 24 },
+    { "para": 18, "pages": 24 },
+    { "para": 19, "pages": 24 },
+    { "para": 20, "pages": 26 },
+    { "para": 21, "pages": 24 },
+    { "para": 22, "pages": 24 },
+    { "para": 23, "pages": 24 },
+    { "para": 24, "pages": 24 },
+    { "para": 25, "pages": 24 },
+    { "para": 26, "pages": 24 },
+    { "para": 27, "pages": 24 },
+    { "para": 28, "pages": 24 },
+    { "para": 29, "pages": 24 },
+    { "para": 30, "pages": 26 }
+  ];  
+  
 
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [PagesofSelectedSurah, setPagesofSelectedSurah] = useState([]);
 
-  const [filterPara, setFilterPara] = useState();
-  const [filterSurah, setFilterSurah] = useState();
+  const [filterSurah, setFilterSurah] = useState([]);
   const [filterPage, setFilterPage] = useState();
 
   const totalPages = pages.length;
   const PageDetail = pages[page - 1];
 
-  console.log("totalPages -> ", totalPages);
-  console.log("page", page);
-  console.log("specific page", PageDetail);
+  // console.log("totalPages -> ", totalPages);
+  // console.log("specific page", PageDetail);
 
   const currentPage = Number(page);
 
   const pageSurah = pages.at(page - 1)?.surah;
   const pageStartAyat = pages.at(page - 1)?.ayah;
 
-  console.log("Surah in Page", pageSurah);
-  console.log("pageStartAyat", pageStartAyat);
+  // console.log("Surah in Page", pageSurah);
+  // console.log("pageStartAyat", pageStartAyat);
 
   const surahNumber = surah[pageSurah - 1]?.number;
   const surahName = surah[pageSurah - 1]?.englishName;
   const surahAyats = surah[pageSurah - 1]?.numberOfAyahs;
 
-  console.log("surahNumber", surahNumber);
-  console.log("surahName", surahName);
-  console.log("Number of Ayats in Surah", surahAyats);
+  // console.log("surahNumber", surahNumber);
+  // console.log("surahName", surahName);
+  // console.log("Number of Ayats in Surah", surahAyats);
 
   const nextPage = currentPage + 1;
   const nextPageStartAyat = pages.at(currentPage)?.ayah;
 
-  console.log("nextPage", nextPage);
-  console.log("nextPageStartAyat", nextPageStartAyat);
+  // console.log("nextPage", nextPage);
+  // console.log("nextPageStartAyat", nextPageStartAyat);
 
   const totalJuzzs = juzzs.length;
   const juzzStartSurah = juzzs[0].surah;
   const juzzStartAyat = juzzs[0].ayah;
 
-  console.log("totalJuzzs", totalJuzzs);
-  console.log("juzzStartSurah , juzzStartAyat", juzzStartSurah, juzzStartAyat);
-  console.log("filterPara", filterPara)
+  // console.log("totalJuzzs", totalJuzzs);
+  // console.log("juzzStartSurah , juzzStartAyat", juzzStartSurah, juzzStartAyat);
+  console.log("filtered Para ----------", filterPara);
+  console.log("page -----------", page);
+  // console.log("Surahinpara", Surahinpara.paras[filterPara]);
 
-  console.log("Juzz->", juzzs.length, "  details-> surah", juzzs[2].surah, "ayat", juzzs[2].ayah)
+  // console.log(
+  //   "Juzz->",
+  //   juzzs.length,
+  //   "  details-> surah",
+  //   juzzs[2].surah,
+  //   "ayat",
+  //   juzzs[2].ayah
+  // );
 
   const handleParaChange = (paraNumber) => {
     setFilterPara(paraNumber);
-  
-    const start = juzzs[paraNumber - 1];
-    const end = juzzs[paraNumber] || { surah: 114, ayah: 6 };
-  
-    const filtered = surah.filter((s) => {
-      const startsInPara =
-        s.number === start.surah && s.numberOfAyahs >= start.ayah;
-  
-      const endsInPara =
-        s.number === end.surah && s.numberOfAyahs <= end.ayah;
-  
-      const fullyInPara = s.number > start.surah && s.number < end.surah;
-  
-      return startsInPara || endsInPara || fullyInPara;
-    });
-  
-    setFilterSurah(filtered);
-    console.log("filtered", filtered)
+
+    // const filteredSurahs =
+    //   Surahinpara.paras.find((para) => para.number === paraNumber)?.surahs ||
+    //   [];
+
+    // setFilterSurah(filteredSurahs);
+    // console.log("Filtered Surahs", filteredSurahs);
   };
-  
 
   const userSchema = z.object({
-    page: z.number().min(1).max(604, 'page must be from 1 to 604')
+    page: z.number().min(1).max(604, "page must be from 1 to 604"),
   });
-
+ 
   useEffect(() => {
     const allPages = Array.from({ length: 604 }, (_, index) => ({
       pageNumber: index + 1,
@@ -99,17 +131,71 @@ const UpdateProgram = () => {
     setPagesofSelectedSurah(allPages);
   }, []);
 
+  const storeData = async (dataObject) => {
+    try {
+      const jsonData = JSON.stringify(dataObject); // Convert object to string
+      await AsyncStorage.setItem("appData", jsonData);
+      console.log("Data saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+  
+  const getData = async () => {
+    try {
+      const jsonData = await AsyncStorage.getItem("appData");
+      if (jsonData) {
+        const dataObject = JSON.parse(jsonData); 
+        console.log("Retrieved data:", dataObject);
+        return dataObject;
+      } else {
+        console.log("No data found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
+  const saveData = async (dataObject) => {
+    if (!dataObject) {
+      console.error("No data provided to save.");
+      return;
+    }
+    await storeData(dataObject);
+  };
+  
+  const loadData = async () => {
+    const data = await getData();
+    console.log("Loaded Data:", data);
+  };
+  
+  // console.log("pages is para", data.at(filterPara).pages)
+
+
+  const AddPage = () => {
+    const dataToSave = {
+      para: filterPara || 1, // Ensure valid default if filterPara is null
+      pages: page || 1, // Ensure valid default if page is null
+    };
+    saveData(dataToSave);
+  };
+  
+  useEffect(() => {
+    loadData();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.inputContainer}>
-
-        <Picker
+        <TouchableOpacity onPress={() => saveData()}>
+          <Text>Store</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => loadData()}>
+          <Text>Retrieve</Text>
+        </TouchableOpacity>
+          <Picker
             selectedValue={filterPara}
             onValueChange={(para) => handleParaChange(para)}
-            // onValueChange={(para) => {
-            //   setFilterPara(para)
-            // }}
             style={styles.picker}
           >
             {juzzs.map((juzz, index) => {
@@ -124,17 +210,18 @@ const UpdateProgram = () => {
               );
             })}
           </Picker>
+          {/* <Text>Para {filterPara} contains {data.at(filterPara).pages}</Text> */}
 
-          <Picker
+          {/* <Picker
             selectedValue={selectedSurah}
-            onValueChange={(itemValue) => setSelectedSurah(itemValue)}
+            onValueChange={(surah) => setSelectedSurah(surah)}
             style={styles.picker}
           >
-            {surah.map((s, index) => (
+            {filterSurah.map((surah) => (
               <Picker.Item
-                key={index}
-                label={`${s.englishName}`}
-                value={s.number}
+                key={surah.number}
+                label={surah.name}
+                value={surah.number}
               />
             ))}
           </Picker>
@@ -151,18 +238,9 @@ const UpdateProgram = () => {
                 value={pageData.pageNumber}
               />
             ))}
-          </Picker>
+          </Picker> */}
 
-          {filterPara !== null && (
-            <View style={styles.selectionContainer}>
-              <Text style={styles.selectedText}>
-                Selected Para:{"  "}
-                <Text style={styles.bold}>Para {filterPara}</Text>
-              </Text>
-            </View>
-          )}
-
-          {selectedSurah !== null && (
+          {/* {selectedSurah !== null && (
             <View style={styles.selectionContainer}>
               <Text style={styles.selectedText}>
                 Selected Surah:{"  "}
@@ -172,22 +250,60 @@ const UpdateProgram = () => {
                 </Text>
               </Text>
             </View>
-          )}
+          )} */}
+
+          
+          <View
+            style={{
+              width: "50%",
+              backgroundColor: "#ACC8E5",
+              paddingBottom: 10,
+              marginTop: 10,
+              paddingHorizontal: 10,
+              paddingTop: 10
+            }}
+          >
+            <Text style={{fontSize: 15, color: 'black', fontWeight: 500}}>Enter Pages: </Text>
+            <TextInput
+              onChangeText={(text) => setPage(text)} // Update state with user input
+              value={page?.toString() || ""} // Convert `page` to string for display
+              keyboardType="numeric"
+              style={{ backgroundColor: "white", color: "black", marginVertical: 10 }}
+            />
+          </View>
 
           {page !== null && (
             <View style={styles.selectionContainer}>
               <Text style={styles.selectedText}>
-                Selected Page:  <Text style={styles.bold}>Page {page}</Text>
+                Selected Pages: <Text style={styles.bold}>{page}</Text>
               </Text>
             </View>
           )}
-          <Text>Page: </Text>
-          <TextInput
-            onChangeText={(e) => setPage(e)}
-            value={page}
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>
+          {filterPara !== null && (
+            <View style={styles.selectionContainer}>
+              <Text style={styles.selectedText}>
+                Selected Para:{"  "}
+                <Text style={styles.bold}>Para {filterPara}</Text>
+              </Text>
+            </View>
+          )}
+
+          <View style={{width: '100%', paddingVertical: 20, justifyContent: 'center', alignItems: 'center'}}>
+            <Button 
+              style={{
+                width: '50%',
+                backgroundColor: 'lightgreen'
+              }}
+              labelStyle={{
+                color: 'black'
+              }}
+              onPress={() => AddPage()}
+            >
+              <Text>Add Pages</Text>
+            </Button>
+          </View>
+
+          {/* <Text style={styles.label}>
             Page {page} surah : {pageSurah}
           </Text>
           <Text style={styles.label}>
@@ -197,12 +313,13 @@ const UpdateProgram = () => {
 
           <Text style={styles.label}>surah Number: {surahNumber}</Text>
           <Text style={styles.label}>Surah Name: {surahName}</Text>
-          <Text style={styles.label}>Number of Ayats in Surah: {surahAyats}</Text>
+          <Text style={styles.label}>
+            Number of Ayats in Surah: {surahAyats}
+          </Text>
 
           <Text style={styles.label}>Next Page: {nextPage}</Text>
 
-          <Text style={styles.label}>Select Para: {filterPara}</Text>
-          
+          <Text style={styles.label}>Select Para: {filterPara}</Text> */}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -247,7 +364,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderColor: "black",
     borderWidth: 1,
-    color: '#112A46'
+    color: "#112A46",
   },
   selectionContainer: {
     marginTop: 10,
@@ -256,7 +373,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 5,
     elevation: 2,
-    width: '70%'
+    width: "60%",
   },
   selectedText: {
     fontSize: 14,
@@ -264,6 +381,6 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: "bold",
     // color: "#007BFF",
-    color: '#0D1804'
+    color: "#0D1804",
   },
 });
