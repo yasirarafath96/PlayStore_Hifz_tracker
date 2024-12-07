@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,29 @@ import {
 import DoughnutChart from "../components/atoms/doughnutChart";
 import Feather from "@expo/vector-icons/Feather";
 import BarGraph from "../components/atoms/barGraph";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get("window").width;
 
 const Dashboard = () => {
   const [visibleModal, setVisibleModal] = useState(false);
-  const [overallPercent, setOverallPercent] = useState(40);
-  const [currentPercent, setCurrentPercent] = useState(1);
+  const [overallPercent, setOverallPercent] = useState();
+  const [currentPercent, setCurrentPercent] = useState();
+
+  useEffect(() => {
+    getData();
+  }, [])
+
+  const getData = async () => {
+    try {
+      const response = await AsyncStorage.getItem("appData")
+      const data = JSON.parse(response)
+      console.log("response", data.student)
+      
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
 
   const overallHifz = [
     { value: overallPercent, color: "green" },
@@ -62,7 +78,13 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity  
+        onPress={() => getData()}
+        >
+          <Text>Retreve</Text>
+        </TouchableOpacity>
       <View style={styles.chartContainer}>
+        
         <View style={styles.chartWrapper}>
           <Text style={styles.chartHeaderText}>Overall Hifz</Text>
           <DoughnutChart data={overallHifz} />

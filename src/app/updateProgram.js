@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   SafeAreaView,
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import pages from "../../constants/pages.json";
@@ -15,45 +15,46 @@ import juzzs from "../../constants/juzzs.json";
 import Surahinpara from "../../constants/SurahInPara.json";
 import { Button, TextInput } from "react-native-paper";
 import { z } from "zod";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UpdateProgram = () => {
   const [page, setPage] = useState();
   const [filterPara, setFilterPara] = useState();
+  const [paraPercent, setParaPercent] = useState();
+  const [overallPercent, setOverallPercent] = useState();
 
   const data = [
-    { "para": 1, "pages": 20 },
-    { "para": 2, "pages": 22 },
-    { "para": 3, "pages": 24 },
-    { "para": 4, "pages": 26 },
-    { "para": 5, "pages": 24 },
-    { "para": 6, "pages": 24 },
-    { "para": 7, "pages": 26 },
-    { "para": 8, "pages": 24 },
-    { "para": 9, "pages": 26 },
-    { "para": 10, "pages": 22 },
-    { "para": 11, "pages": 24 },
-    { "para": 12, "pages": 24 },
-    { "para": 13, "pages": 24 },
-    { "para": 14, "pages": 24 },
-    { "para": 15, "pages": 24 },
-    { "para": 16, "pages": 24 },
-    { "para": 17, "pages": 24 },
-    { "para": 18, "pages": 24 },
-    { "para": 19, "pages": 24 },
-    { "para": 20, "pages": 26 },
-    { "para": 21, "pages": 24 },
-    { "para": 22, "pages": 24 },
-    { "para": 23, "pages": 24 },
-    { "para": 24, "pages": 24 },
-    { "para": 25, "pages": 24 },
-    { "para": 26, "pages": 24 },
-    { "para": 27, "pages": 24 },
-    { "para": 28, "pages": 24 },
-    { "para": 29, "pages": 24 },
-    { "para": 30, "pages": 26 }
-  ];  
-  
+    { para: 1, pages: 20 },
+    { para: 2, pages: 22 },
+    { para: 3, pages: 24 },
+    { para: 4, pages: 26 },
+    { para: 5, pages: 24 },
+    { para: 6, pages: 24 },
+    { para: 7, pages: 26 },
+    { para: 8, pages: 24 },
+    { para: 9, pages: 26 },
+    { para: 10, pages: 22 },
+    { para: 11, pages: 24 },
+    { para: 12, pages: 24 },
+    { para: 13, pages: 24 },
+    { para: 14, pages: 24 },
+    { para: 15, pages: 24 },
+    { para: 16, pages: 24 },
+    { para: 17, pages: 24 },
+    { para: 18, pages: 24 },
+    { para: 19, pages: 24 },
+    { para: 20, pages: 26 },
+    { para: 21, pages: 24 },
+    { para: 22, pages: 24 },
+    { para: 23, pages: 24 },
+    { para: 24, pages: 24 },
+    { para: 25, pages: 24 },
+    { para: 26, pages: 24 },
+    { para: 27, pages: 24 },
+    { para: 28, pages: 24 },
+    { para: 29, pages: 24 },
+    { para: 30, pages: 26 },
+  ];
 
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [PagesofSelectedSurah, setPagesofSelectedSurah] = useState([]);
@@ -122,7 +123,7 @@ const UpdateProgram = () => {
   const userSchema = z.object({
     page: z.number().min(1).max(604, "page must be from 1 to 604"),
   });
- 
+
   useEffect(() => {
     const allPages = Array.from({ length: 604 }, (_, index) => ({
       pageNumber: index + 1,
@@ -140,12 +141,12 @@ const UpdateProgram = () => {
       console.error("Error saving data:", error);
     }
   };
-  
+
   const getData = async () => {
     try {
       const jsonData = await AsyncStorage.getItem("appData");
       if (jsonData) {
-        const dataObject = JSON.parse(jsonData); 
+        const dataObject = JSON.parse(jsonData);
         console.log("Retrieved data:", dataObject);
         return dataObject;
       } else {
@@ -163,23 +164,58 @@ const UpdateProgram = () => {
     }
     await storeData(dataObject);
   };
-  
+
   const loadData = async () => {
     const data = await getData();
     console.log("Loaded Data:", data);
   };
-  
+
   // console.log("pages is para", data.at(filterPara).pages)
 
+  const calculatePercentage = () => {
+    const currentParaData = data[filterPara - 1];
+    const totalPagesRead = parseInt(page, 10) || 0;
+
+    if (currentParaData) {
+      const paraTotalPages = currentParaData.pages;
+
+      const paraPercentage = Math.min(
+        (totalPagesRead / paraTotalPages) * 100,
+        100
+      ).toFixed(2);
+      setParaPercent(paraPercentage);
+
+      const totalPagesInQuran = data.reduce((sum, para) => sum + para.pages, 0);
+      const overallPagesRead =
+        data
+          .slice(0, filterPara - 1)
+          .reduce((sum, para) => sum + para.pages, 0) + totalPagesRead;
+      const overallPercentage = Math.min(
+        (overallPagesRead / totalPagesInQuran) * 100,
+        100
+      ).toFixed(2);
+      setOverallPercent(overallPercentage);
+
+      console.log(`Para ${filterPara} Percentage: ${paraPercentage}%`);
+      console.log(`Overall Percentage: ${overallPercentage}%`);
+    } else {
+      console.error("Invalid para data or filterPara");
+    }
+  };
 
   const AddPage = () => {
+    calculatePercentage();
     const dataToSave = {
-      para: filterPara || 1, // Ensure valid default if filterPara is null
-      pages: page || 1, // Ensure valid default if page is null
+      student_1: {
+        para: filterPara || 1,
+        pages: page || 1,
+        paraPercent: paraPercent,
+        overallPercent: overallPercent,
+      },
     };
     saveData(dataToSave);
   };
-  
+
   useEffect(() => {
     loadData();
   }, []);
@@ -187,12 +223,12 @@ const UpdateProgram = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={() => saveData()}>
-          <Text>Store</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => loadData()}>
-          <Text>Retrieve</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => saveData()}>
+            <Text>Store</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => loadData()}>
+            <Text>Retrieve</Text>
+          </TouchableOpacity>
           <Picker
             selectedValue={filterPara}
             onValueChange={(para) => handleParaChange(para)}
@@ -252,7 +288,6 @@ const UpdateProgram = () => {
             </View>
           )} */}
 
-          
           <View
             style={{
               width: "50%",
@@ -260,15 +295,21 @@ const UpdateProgram = () => {
               paddingBottom: 10,
               marginTop: 10,
               paddingHorizontal: 10,
-              paddingTop: 10
+              paddingTop: 10,
             }}
           >
-            <Text style={{fontSize: 15, color: 'black', fontWeight: 500}}>Enter Pages: </Text>
+            <Text style={{ fontSize: 15, color: "black", fontWeight: 500 }}>
+              Enter Pages:{" "}
+            </Text>
             <TextInput
               onChangeText={(text) => setPage(text)} // Update state with user input
               value={page?.toString() || ""} // Convert `page` to string for display
               keyboardType="numeric"
-              style={{ backgroundColor: "white", color: "black", marginVertical: 10 }}
+              style={{
+                backgroundColor: "white",
+                color: "black",
+                marginVertical: 10,
+              }}
             />
           </View>
 
@@ -288,14 +329,21 @@ const UpdateProgram = () => {
             </View>
           )}
 
-          <View style={{width: '100%', paddingVertical: 20, justifyContent: 'center', alignItems: 'center'}}>
-            <Button 
+          <View
+            style={{
+              width: "100%",
+              paddingVertical: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
               style={{
-                width: '50%',
-                backgroundColor: 'lightgreen'
+                width: "50%",
+                backgroundColor: "lightgreen",
               }}
               labelStyle={{
-                color: 'black'
+                color: "black",
               }}
               onPress={() => AddPage()}
             >
