@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,8 @@ const screenWidth = Dimensions.get("window").width;
 
 const Dashboard = () => {
   const [visibleModal, setVisibleModal] = useState(false);
-  const [overallPercent, setOverallPercent] = useState();
-  const [currentPercent, setCurrentPercent] = useState();
+  const [overallPercent, setOverallPercent] = useState(0);
+  const [currentPercent, setCurrentPercent] = useState(0);
 
   useEffect(() => {
     getData();
@@ -26,21 +26,27 @@ const Dashboard = () => {
     try {
       const response = await AsyncStorage.getItem("appData")
       const data = JSON.parse(response)
-      console.log("response", data.student)
-      
+      console.log("response", data);
+      const current = data.paraPercent;
+      const overall = data.overallPercent;
+      setCurrentPercent(current);
+      setOverallPercent(overall);
+
     } catch (error) {
       console.log("error", error)
     }
   }
 
-  const overallHifz = [
+  const overallHifz = useMemo(() => [
     { value: overallPercent, color: "green" },
     { value: 100 - overallPercent, color: "grey" },
-  ];
-  const currentJuzz = [
+  ], [overallPercent]);
+  
+  const currentJuzz = useMemo(() => [
     { value: currentPercent, color: "green" },
     { value: 100 - currentPercent, color: "grey" },
-  ];
+  ], [currentPercent]);
+  
   const customProgress = [
     20,
     30,

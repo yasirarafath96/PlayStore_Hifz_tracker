@@ -14,7 +14,7 @@ import surah from "../..//constants/surah.json";
 import juzzs from "../../constants/juzzs.json";
 import Surahinpara from "../../constants/SurahInPara.json";
 import { Button, TextInput } from "react-native-paper";
-import { z } from "zod";
+import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UpdateProgram = () => {
@@ -22,6 +22,8 @@ const UpdateProgram = () => {
   const [filterPara, setFilterPara] = useState();
   const [paraPercent, setParaPercent] = useState();
   const [overallPercent, setOverallPercent] = useState();
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   const data = [
     { para: 1, pages: 20 },
@@ -111,18 +113,7 @@ const UpdateProgram = () => {
 
   const handleParaChange = (paraNumber) => {
     setFilterPara(paraNumber);
-
-    // const filteredSurahs =
-    //   Surahinpara.paras.find((para) => para.number === paraNumber)?.surahs ||
-    //   [];
-
-    // setFilterSurah(filteredSurahs);
-    // console.log("Filtered Surahs", filteredSurahs);
   };
-
-  const userSchema = z.object({
-    page: z.number().min(1).max(604, "page must be from 1 to 604"),
-  });
 
   useEffect(() => {
     const allPages = Array.from({ length: 604 }, (_, index) => ({
@@ -135,7 +126,7 @@ const UpdateProgram = () => {
   const storeData = async (dataObject) => {
     try {
       const jsonData = JSON.stringify(dataObject); // Convert object to string
-      await AsyncStorage.setItem("appData", jsonData);
+      await AsyncStorage.setItem(`student_${1}`, jsonData);
       console.log("Data saved successfully!");
     } catch (error) {
       console.error("Error saving data:", error);
@@ -144,10 +135,10 @@ const UpdateProgram = () => {
 
   const getData = async () => {
     try {
-      const jsonData = await AsyncStorage.getItem("appData");
+      const jsonData = await AsyncStorage.getItem(`student_${1}`);
       if (jsonData) {
         const dataObject = JSON.parse(jsonData);
-        console.log("Retrieved data:", dataObject);
+        // console.log("Retrieved data:", dataObject);
         return dataObject;
       } else {
         console.log("No data found");
@@ -204,15 +195,42 @@ const UpdateProgram = () => {
   };
 
   const AddPage = () => {
+    const now = moment().format("YYYY-MM-DD HH:mm:ss");
+    setStartDate(now);
     calculatePercentage();
-    const dataToSave = {
-      student_1: {
-        para: filterPara || 1,
-        pages: page || 1,
-        paraPercent: paraPercent,
-        overallPercent: overallPercent,
+    const dataToSave = [
+      {
+        ActiveStudent: '1'
       },
-    };
+      {
+      id: 1,
+      name: "User",
+      current: {
+        currentPara: filterPara,
+        currentParaPages: page,
+        currentParaPercent: paraPercent,
+        startDate: startDate,
+        endDate: endDate,
+      },
+      overAll: {
+        totalParaCompleted: 0,
+        overAllPercent: overallPercent
+      }
+    }, {
+      id: 2,
+      name: "Noman",
+      current: {
+        currentPara: filterPara,
+        currentParaPages: page,
+        currentParaPercent: paraPercent,
+        startDate: startDate,
+        endDate: endDate,
+      },
+      overAll: {
+        totalParaCompleted: 0,
+        overAllPercent: overallPercent
+      }
+    }];
     saveData(dataToSave);
   };
 

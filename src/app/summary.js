@@ -1,33 +1,39 @@
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Summary = () => {
-  const data = [
-    {
-      juzz: "1",
-      startDate: "2024-01-01",
-      endDate: "2024-01-07",
-      totalTime: "7 days",
-    },
-    {
-      juzz: "2",
-      startDate: "2024-01-08",
-      endDate: "2024-01-14",
-      totalTime: "7 days",
-    },
-    {
-      juzz: "3",
-      startDate: "2024-01-15",
-      endDate: "2024-01-21",
-      totalTime: "7 days",
-    },
-    {
-      juzz: "4",
-      startDate: "2024-01-22",
-      endDate: "2024-01-28",
-      totalTime: "7 days",
-    },
-  ];
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const jsonData = await AsyncStorage.getItem(`student_${1}`);
+      if (jsonData) {
+        const dataObject = JSON.parse(jsonData);
+        console.log("Retrieved data:", dataObject);
+
+        const transformedData = dataObject
+          .filter((item) => item.current) 
+          .map((item) => ({
+            id: item.id,
+            juzz: item.current.currentPara || "N/A", // Use `currentPara` as Juzz
+            startDate: item.current.startDate || "N/A", // Use `startDate` or fallback
+            endDate: "Nil", 
+            totalTime: "Nil",
+          }));
+
+        setData(transformedData);
+      } else {
+        console.log("No data found");
+      }
+    } catch (error) {
+      console.error("Error retrieving data:", error);
+    }
+  };
 
   const renderItem = ({ item }) => (
     <View style={styles.tableRow}>
@@ -49,7 +55,7 @@ const Summary = () => {
       <FlatList
         data={data}
         renderItem={renderItem}
-        keyExtractor={(item) => item.juzz}
+        keyExtractor={(item) => item.id.toString()}
       />
     </View>
   );

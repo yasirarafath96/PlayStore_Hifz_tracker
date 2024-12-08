@@ -16,10 +16,12 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import AddStudent from "./AddStudentModal";
 import RemoveStudent from "./RemoveStudent";
 import SwitchStudent from "./SwitchStudentModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileModal = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(300));
-  const [students, setStudents] = useState(["Yasir"]);
+  const [students, setStudents] = useState(['User']);
+  const [StudentData, setStudentData] = useState();
   const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
   const [removeStudentModalVisible, setRemoveStudentModalVisible] =
     useState(false);
@@ -27,6 +29,66 @@ const ProfileModal = ({ visible, onClose }) => {
     useState(false);
 
   console.log("students", students);
+
+  useEffect(() => {
+    storeData();
+    // getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const response = await AsyncStorage.getItem(`student_${1}`);
+      if (response) {
+        const Studentdata = JSON.parse(response);
+        setStudentData(Studentdata);
+        console.log("StudentData", Studentdata[0]);
+      } else {
+        console.log("student array not found");
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const storeData = async () => {
+    try {
+      const student = [
+        {
+          ActiveStudent: '1'
+        },
+        {
+        id: 1,
+        name: "User",
+        current: {
+          currentPara: 0,
+          currentParaPages: 0,
+          currentParaPercent: 0
+        },
+        overAll: {
+          totalParaCompleted: 0,
+          overAllPercent: 0
+        }
+      }, {
+        id: 2,
+        name: "Noman",
+        current: {
+          currentPara: 2,
+          currentParaPages: 10,
+          currentParaPercent: 20
+        },
+        overAll: {
+          totalParaCompleted: 1,
+          overAllPercent: 6
+        }
+      }];
+      const StudentData = JSON.stringify(student);
+      await AsyncStorage.setItem(`student_${1}`, StudentData);
+      console.log("Students array Saved");
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
 
   useEffect(() => {
     if (visible) {

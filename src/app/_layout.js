@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -20,6 +20,7 @@ import { Portal, Button, PaperProvider } from "react-native-paper";
 import ProfileModal from "../components/molecules/ProfileModal";
 import AddStudentModal from "../components/molecules/AddStudentModal";
 import { Avatar, Icon } from "react-native-magnus";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Layout() {
   // const [modalVisible, setModalVisible] = useState(false);
@@ -38,7 +39,7 @@ export default function Layout() {
 
   const handleSaveStudent = () => {
     if (studentName.trim()) {
-      setStudents((prevStudents) => [...prevStudents, studentName]); // Add the new student to the array
+      setStudents((prevStudents) => [...prevStudents, studentName]);
       console.log("Student added:", studentName);
       setStudentName(""); // Clear the input
       setAddStudentModalVisible(false); // Close the modal
@@ -67,7 +68,6 @@ export default function Layout() {
               headerRight: () => (
                 <TouchableOpacity
                   style={{ marginRight: 15 }}
-                  // onPress={() => setModalVisible(true)}
                   onPress={() => setProfileModal(true)}
                 >
                   <Avatar bg="green800" rounded="sm" size={32}>

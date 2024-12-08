@@ -1,9 +1,95 @@
-import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
 import { Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button } from "react-native-paper";
 
-const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent, student }) => {
+const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent: saveStudentProp, student }) => {
   const [studentName, setStudentName] = useState("");
+
+  const saveStudent = async (studentName) => {
+    try {
+      const response = await AsyncStorage.getItem(`student_${1}`);
+      let studentData = response ? JSON.parse(response) : [];
+
+      const newStudent = {
+        id: studentData.length + 1, 
+        name: studentName,
+        current: {
+          currentPara: 0,
+          currentParaPages: 0,
+          currentParaPercent: 0,
+        },
+        overAll: {
+          totalParaCompleted: 0,
+          overAllPercent: 0,
+        },
+      };
+      studentData.push(newStudent);
+  
+      await AsyncStorage.setItem(`student_${1}`, JSON.stringify(studentData));
+      console.log("New student added:", newStudent);
+      setAddStudentModalVisible(false);
+      setStudentName("");
+  
+    } catch (error) {
+      console.log("Error saving student:", error);
+    }
+  };
+  
+
+  useEffect(() => {
+    // storeData();
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const response = await AsyncStorage.getItem(`student_${1}`);
+      if (response) {
+        const StudentData = JSON.parse(response);
+        console.log("StudentData", StudentData);
+      } else {
+        console.log("student array not found");
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const storeData = async () => {
+    try {
+      const student = [{
+        id: 1,
+        name: "Yasir",
+        current: {
+          currentPara: 2,
+          currentParaPages: 10,
+          currentParaPercent: 20
+        },
+        overAll: {
+          totalParaCompleted: 1,
+          overAllPercent: 6
+        }
+      }, {
+        id: 2,
+        name: "Noman",
+        current: {
+          currentPara: 2,
+          currentParaPages: 10,
+          currentParaPercent: 20
+        },
+        overAll: {
+          totalParaCompleted: 1,
+          overAllPercent: 6
+        }
+      }];
+      const StudentData = JSON.stringify(student);
+      await AsyncStorage.setItem(`student_${1}`, StudentData);
+      console.log("Students array Saved");
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   return (
     <Modal
@@ -31,7 +117,7 @@ const AddStudentModal = ({ visible, setAddStudentModalVisible, handleSaveStudent
               buttonColor="#28A745"
               labelStyle={styles.buttonText}
               style={styles.button}
-              onPress={() => handleSaveStudent(studentName)}
+              onPress={() => saveStudent(studentName)}
             >
               Save
             </Button>
