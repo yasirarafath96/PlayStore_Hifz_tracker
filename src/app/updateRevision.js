@@ -1,227 +1,157 @@
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
-  Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import axios, { Axios } from "axios";
-import surahjson from '../../constants/surah.json'
+import { DataTable } from "react-native-paper";
+import axios from "axios";
 
 const UpdateRevision = () => {
-  const [selectedJuz, setSelectedJuz] = useState("30");
-  const [selectedSurah, setSelectedSurah] = useState(0);
-  const [selectedPage, setSelectedPage] = useState("");
-  const [surahs, setSurahs] = useState([]);
-  const [pages, setPages] = useState([]);
-  const [data, setData] = useState([
-    { surah: "Al-Fatiha", page: 1, mistakes: "0" },
+  const [filterPara, setFilterPara] = useState();
+  const [surahs, setSurahs] = useState([
+    { surahName: "Al-Fatiha", page: 1, mistakes: 0 },
+    { surahName: "Al-Baqarah", page: 2, mistakes: 1 },
+    { surahName: "Al-Imran", page: 3, mistakes: 2 },
+    { surahName: "An-Nisa", page: 4, mistakes: 3 },
+
+    { surahName: "Al-Maidah", page: 5, mistakes: 1 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-Fatiha", page: 1, mistakes: 0 },
+    { surahName: "Al-Baqarah", page: 2, mistakes: 1 },
+    { surahName: "Al-Imran", page: 3, mistakes: 2 },
+    { surahName: "An-Nisa", page: 4, mistakes: 3 },
+    { surahName: "Al-Maidah", page: 5, mistakes: 1 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
+    { surahName: "Al-An'am", page: 6, mistakes: 2 },
   ]);
+  const [selectedMistake, setSelectedMistake] = useState({});
+  const [sortDirection, setSortDirection] = useState("ascending");
+  const [page, setPage] = useState(0);
+  const numberOfItemsPerPageList = [4, 6, 8];
+  const [numberOfItemsPerPage, setNumberOfItemsPerPage] = useState(numberOfItemsPerPageList[0]);
 
-  const [metaData, setMetaData] = useState(null);
+  const sortedData = [...surahs].sort((a, b) =>
+    sortDirection === "ascending" ? a.page - b.page : b.page - a.page
+  );
+  const from = page * numberOfItemsPerPage;
+  const to = Math.min((page + 1) * numberOfItemsPerPage, sortedData.length);
+  const paginatedData = sortedData.slice(from, to);
 
-  // console.log("surahs of quran",  surah)
-
-
-  const getDotColor = (mistakes) => {
-    if (mistakes === "0") return "green";
-    if (mistakes === "1" || mistakes === "2") return "orange";
-    return "red";
+  const handleParaChange = (paraNumber) => {
+    setFilterPara(paraNumber);
   };
 
-  const handleJuzChange = async (juz) => {
-    setSelectedJuz(juz);
-    setSelectedSurah("");
-    setSelectedPage("");
-    setSurahs([]);
-    setPages([]);
-    try {
-      const response = await axios.get(
-        `http://api.alquran.cloud/v1/juz/${juz}/en.asad`
-      );
-      const ayahs = response.data.data.ayahs;
-
-      const uniqueSurahs = Array.from(
-        new Set(ayahs.map((ayah) => ayah.surah.englishName))
-      );
-      setSurahs(uniqueSurahs);
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Failed to fetch Surahs for the selected Juz.");
-    }
+  const toggleSortDirection = () => {
+    setSortDirection((prev) =>
+      prev === "ascending" ? "descending" : "ascending"
+    );
   };
 
-  const handleSurahChange = async (surah) => {
-    setSelectedSurah(surah);
-    setSelectedPage("");
-    setPages([]);
-    try {
-      const quran = await axios.get(`https://api.alquran.cloud/v1/meta`);
-      const response = await axios.get(
-        `http://api.alquran.cloud/v1/juz/${selectedJuz}/en.asad`
-      );
-      const surah = quran.data;
-      const ayahs = response.data.data.ayahs;
-
-      console.log("surah -----",surah)
-
-      const filteredPages = Array.from(
-        new Set(
-          ayahs
-            .filter((ayah) => ayah.surah.englishName === surah)
-            .map((ayah) => ayah.page)
-        )
-      );
-      setPages(filteredPages);
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Failed to fetch pages for the selected Surah.");
-    }
+  const handlePickerChange = (index, value) => {
+    setSelectedMistake((prev) => ({ ...prev, [index]: value }));
   };
 
-  const handleAddRow = () => {
-    if (!selectedJuz || !selectedSurah || !selectedPage) {
-      Alert.alert("Error", "Please select Juz, Surah, and Page.");
-      return;
-    }
-
-    const newRow = {
-      surah: selectedSurah,
-      page: parseInt(selectedPage),
-      mistakes: "0",
-    };
-
-    setData((prevData) => [...prevData, newRow]);
-    Alert.alert("Success", "Record added successfully!");
-  };
-
-  const handleMistakeChange = (index, value) => {
-    const updatedData = [...data];
-    updatedData[index].mistakes = value;
-    setData(updatedData);
-  };
-
-  // console.log(data);
-
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await axios.get("https://api.alquran.cloud/v1/meta");
-  //     console.log("Full API Response:", response); // Log the entire response object
-  //     const data = response.data;
-  //     setMetaData(data); // Store the data in state
-  //   } catch (error) {
-  //     console.error("Error fetching Quran metadata:", error.message);
-  //     if (error.response) {
-  //       console.error("Response Error:", error.response.data);
-  //     } else if (error.request) {
-  //       console.error("No Response from Server:", error.request);
-  //     } else {
-  //       console.error("Request Error:", error.message);
-  //     }
-  //   }
-  // };
-  
   useEffect(() => {
-    console.log("surahjson",  surahjson[selectedSurah])
+    if (filterPara) {}
+  }, [filterPara]);
 
-  }, []);
-  
+  useEffect(() => {
+    setPage(0);
+  }, [numberOfItemsPerPage]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        {/* Input Section */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Select Juz:</Text>
-          <Picker
-            selectedValue={selectedJuz}
-            style={styles.picker}
-            onValueChange={(itemValue) => handleJuzChange(itemValue)}
-          >
-            {Array.from({ length: 30 }, (_, i) => (
-              <Picker.Item key={i} label={`${i + 1}`} value={`${i + 1}`} />
-            ))}
-          </Picker>
 
-          {surahs.length > 0 && (
-            <>
-              <Text style={styles.label}>Select Surah:</Text>
-              <Picker
-                selectedValue={selectedSurah}
-                style={styles.picker}
-                onValueChange={(itemValue) => handleSurahChange(itemValue)}
-              >
-                {surahs.map((surah, index) => (
-                  <Picker.Item key={index} label={surah} value={surah} />
-                ))}
-              </Picker>
-            </>
-          )}
+        <View style={{ paddingVertical: 5 }}>
+          <Text style={{ fontSize: 14, fontWeight: "500" }}>Select Juzz</Text>
+        </View>
+        <Picker
+          selectedValue={filterPara}
+          onValueChange={(para) => handleParaChange(para)}
+          style={styles.picker}
+        >
+          {[...Array(30).keys()].map((i) => (
+            <Picker.Item
+              key={i + 1}
+              label={`Para ${i + 1}`}
+              value={i + 1}
+              color={filterPara === i + 1 ? "#007BFF" : "#000"}
+              style={{ fontSize: 14 }}
+            />
+          ))}
+        </Picker>
 
-          {pages.length > 0 && (
-            <>
-              <Text style={styles.label}>Select Page:</Text>
-              <Picker
-                selectedValue={selectedPage}
-                style={styles.picker}
-                onValueChange={(itemValue) => setSelectedPage(itemValue)}
-              >
-                {pages.map((page, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={`${page}`}
-                    value={`${page}`}
-                  />
-                ))}
-              </Picker>
-            </>
-          )}
-
-          <TouchableOpacity style={styles.button} onPress={handleAddRow}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
+        <View style={{ paddingVertical: 5 }}>
+          {filterPara ? (
+            <Text style={{ fontSize: 14, fontWeight: "500" }}>
+              Selected Juzz: {filterPara}
+            </Text>
+          ) : null}
         </View>
 
-        {/* Custom Table */}
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>Surah</Text>
-            <Text style={styles.tableHeaderText}>Page</Text>
-            <Text style={styles.tableHeaderText}># of Mistakes</Text>
-          </View>
-          {data.map((item, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{item.surah}</Text>
-              <Text style={styles.tableCell}>{item.page}</Text>
-              <View style={styles.mistakesContainer}>
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title
+              sortDirection={sortDirection}
+              onPress={toggleSortDirection}
+            >
+              Juzz {filterPara}
+            </DataTable.Title>
+          </DataTable.Header>
+
+          <DataTable.Header>
+            <DataTable.Title numeric style={{ flex: 1 }}>Surah</DataTable.Title>
+            <DataTable.Title numeric style={{ flex: 1 }}>Page</DataTable.Title>
+            <DataTable.Title numeric style={{ flex: 2 }}>Mistakes</DataTable.Title>
+          </DataTable.Header>
+
+          {paginatedData.map((item, index) => (
+            <DataTable.Row key={index}>
+              <DataTable.Cell numeric style={{ flex: 1 }}>{item.surahName}name</DataTable.Cell>
+              <DataTable.Cell numeric style={{ flex: 1 }}>{item.page}10</DataTable.Cell>
+              <DataTable.Cell numeric style={{ flex: 2 }}>
                 <Picker
-                  selectedValue={item.mistakes || "0"} // Ensure default value is "0"
-                  style={styles.mistakesPicker}
-                  onValueChange={(value) => handleMistakeChange(index, value)}
+                  selectedValue={selectedMistake[index] || item.mistakes}
+                  onValueChange={(value) => handlePickerChange(index, value)}
+                  style={{ height: 40, width: 100 }}
                 >
-                  <Picker.Item label="0" value="0" />
                   <Picker.Item label="1" value="1" />
                   <Picker.Item label="2" value="2" />
                   <Picker.Item label="3" value="3" />
                 </Picker>
-                <View
-                  style={[
-                    styles.dot,
-                    { backgroundColor: getDotColor(item.mistakes || "0") },
-                  ]} // Use "0" if item.mistakes is undefined
-                />
-              </View>
-            </View>
+              </DataTable.Cell>
+            </DataTable.Row>
           ))}
-        </View>
+          
+          <DataTable.Pagination
+            page={page}
+            numberOfPages={Math.ceil(surahs.length / numberOfItemsPerPage)}
+            onPageChange={(newPage) => setPage(newPage)}
+            label={`${from + 1}-${to} of ${surahs.length}`}
+            showFastPaginationControls
+            numberOfItemsPerPageList={numberOfItemsPerPageList}
+            numberOfItemsPerPage={numberOfItemsPerPage}
+            onItemsPerPageChange={setNumberOfItemsPerPage}
+            selectPageDropdownLabel={"Rows per page"}
+          />
+        </DataTable>
       </View>
     </SafeAreaView>
   );
 };
-
-export default UpdateRevision;
 
 const styles = StyleSheet.create({
   container: {
@@ -229,67 +159,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
   },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
   picker: {
-    height: 50,
-    width: "100%",
+    height: 40,
+    width: "60%",
     marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  table: {
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: "black",
-  },
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: "#f0f0f0",
-    paddingVertical: 10,
-    justifyContent: "space-between",
-  },
-  tableHeaderText: {
-    flex: 1,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "black",
-    paddingVertical: 10,
-    justifyContent: "space-between",
-  },
-  tableCell: {
-    flex: 1,
-    textAlign: "center",
-  },
-  mistakesContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 150,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginLeft: 5,
+    backgroundColor: "white",
   },
 });
+
+export default UpdateRevision;

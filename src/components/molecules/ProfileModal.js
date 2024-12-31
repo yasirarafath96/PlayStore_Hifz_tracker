@@ -17,78 +17,80 @@ import AddStudent from "./AddStudentModal";
 import RemoveStudent from "./RemoveStudent";
 import SwitchStudent from "./SwitchStudentModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const ProfileModal = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(300));
-  const [students, setStudents] = useState(['User']);
-  const [StudentData, setStudentData] = useState();
+  const [students, setStudents] = useState([]);
+  const [activeStudent, setActiveStudent] = useState(null);
   const [addStudentModalVisible, setAddStudentModalVisible] = useState(false);
   const [removeStudentModalVisible, setRemoveStudentModalVisible] =
     useState(false);
   const [switchStudentModalVisible, setSwitchStudentModalVisible] =
     useState(false);
 
-  console.log("students", students);
-
   useEffect(() => {
-    storeData();
-    // getData();
+    getStudents();
   }, []);
 
-  const getData = async () => {
+  // const getStudents = async () => {
+  //   try {
+  //     const response = await AsyncStorage.getItem("students_list");
+  //     const studentList = response
+  //       ? JSON.parse(response)
+  //       : [{ id: 1, student: "User", active: false }];
+  //     setStudents(studentList);
+
+  //     const active = studentList.find((s) => s.active);
+  //     setActiveStudent(active ? active.student : null);
+  //   } catch (error) {
+  //     console.error("Error fetching students:", error);
+  //   }
+  // };
+
+  const getStudents = async () => {
     try {
-      const response = await AsyncStorage.getItem(`student_${1}`);
-      if (response) {
-        const Studentdata = JSON.parse(response);
-        setStudentData(Studentdata);
-        console.log("StudentData", Studentdata[0]);
-      } else {
-        console.log("student array not found");
-      }
+      const response = await axios.get("http://192.168.209.134:5001/");
+      const studentList = response.data.length
+        ? response.data
+        : [{ id: 1, student: "User", active: false }];
+      setStudents(studentList);
+
+      const active = studentList.find((s) => s.active);
+      setActiveStudent(active ? active.student : null);
     } catch (error) {
-      console.log("error", error);
+      console.error("Error fetching students:", error);
     }
   };
 
-  const storeData = async () => {
+  const saveStudent = async (newStudent) => {
     try {
-      const student = [
-        {
-          ActiveStudent: '1'
-        },
-        {
-        id: 1,
-        name: "User",
-        current: {
-          currentPara: 0,
-          currentParaPages: 0,
-          currentParaPercent: 0
-        },
-        overAll: {
-          totalParaCompleted: 0,
-          overAllPercent: 0
-        }
-      }, {
-        id: 2,
-        name: "Noman",
-        current: {
-          currentPara: 2,
-          currentParaPages: 10,
-          currentParaPercent: 20
-        },
-        overAll: {
-          totalParaCompleted: 1,
-          overAllPercent: 6
-        }
-      }];
-      const StudentData = JSON.stringify(student);
-      await AsyncStorage.setItem(`student_${1}`, StudentData);
-      console.log("Students array Saved");
+      const newStudentObject = {
+        id: students.length > 0 ? students[students.length - 1].id + 1 : 1,
+        student: newStudent,
+        active: false,
+      };
+
+      const updatedStudents = [...students, newStudentObject];
+
+      // const userData = { id: 1, name: studentName, acttive: true };
+      // const response = await axios
+      //   .post("http://192.168.209.134:5001/register", updatedStudents)
+      //   .then((res) => console.log("response", res.data))
+      //   .catch((err) => console.log(err));
+      // console.log("Response:", response.data);
+
+      await AsyncStorage.setItem(
+        "students_list",
+        JSON.stringify(updatedStudents)
+      );
+
+      setStudents(updatedStudents);
+      setAddStudentModalVisible(false);
     } catch (error) {
-      console.log("error", error);
+      console.error("Error saving student:", error);
     }
   };
-
 
   useEffect(() => {
     if (visible) {
@@ -104,19 +106,18 @@ const ProfileModal = ({ visible, onClose }) => {
     }
   }, [visible, slideAnim]);
 
-  const handleSaveStudent = (studentName) => {
-    console.log("Student Saved:", studentName);
-    setAddStudentModalVisible(false);
-  };
-
   const handleAddStudentPress = () => {
     setAddStudentModalVisible(true);
   };
   const handleRemoveStudentPress = () => {
-    setRemoveStudentModalVisible(true);
+    if (students.length > 1) {
+      setRemoveStudentModalVisible(true); /// need to add Toast
+    }
   };
   const handleSwitchStudentPress = () => {
-    setSwitchStudentModalVisible(true);
+    if (students.length > 1) {
+      setSwitchStudentModalVisible(true); /// need to add toast
+    }
   };
 
   return (
@@ -131,7 +132,7 @@ const ProfileModal = ({ visible, onClose }) => {
           >
             {/* Modal Header */}
             <View style={styles.modalHeader}>
-              <Text style={styles.modalText}>{students[0]}</Text>
+              <Text style={styles.modalText}>{activeStudent}</Text>
               <TouchableOpacity onPress={onClose}>
                 <Fontisto name="close-a" size={18} color="#FF6347" />
               </TouchableOpacity>
@@ -168,20 +169,23 @@ const ProfileModal = ({ visible, onClose }) => {
       <AddStudent
         visible={addStudentModalVisible}
         setAddStudentModalVisible={setAddStudentModalVisible}
-        handleSaveStudent={handleSaveStudent}
-        students={students}
+        handleSaveStudent={saveStudent}
       />
 
       <RemoveStudent
         visible={removeStudentModalVisible}
         setRemoveStudentModalVisible={setRemoveStudentModalVisible}
         students={students}
+        setStudents={setStudents}
       />
       <SwitchStudent
         visible={switchStudentModalVisible}
         setSwitchStudentModalVisible={setSwitchStudentModalVisible}
-        handleSwitchStudent={handleSwitchStudentPress}
         students={students}
+        onActiveStudentChange={(name) => {
+          setActiveStudent(name);
+          getStudents();
+        }}
       />
     </>
   );
@@ -192,7 +196,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "flex-end",
-    // backgroundColor: "rgba(0, 0, 0, 0.5)",
     backgroundColor: "transparent",
     position: "absolute",
     top: 0,

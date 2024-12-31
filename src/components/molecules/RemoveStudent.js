@@ -1,35 +1,40 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const RemoveStudent = ({ visible, setRemoveStudentModalVisible, students }) => {
+const RemoveStudent = ({
+  visible,
+  setRemoveStudentModalVisible,
+  students,
+  setStudents,
+}) => {
   const [selectedStudents, setSelectedStudents] = useState({});
 
-  const toggleStudentSelection = (student) => {
+  // Toggle selected students
+  const toggleStudentSelection = (studentId) => {
     setSelectedStudents((prev) => ({
       ...prev,
-      [student]: !prev[student],
+      [studentId]: !prev[studentId],
     }));
   };
 
-  const getData = async () => {
+  // Handle Remove Selected
+  const removeSelectedStudents = async () => {
     try {
-      const response = await AsyncStorage.getItem(`student_${1}`);
-      if (response) {
-        const StudentData = JSON.parse(response);
-        console.log("StudentData", StudentData);
-      } else {
-        console.log("student array not found");
-      }
+      // Filter out students that are not selected
+      const updatedStudents = students.filter(
+        (student) => !selectedStudents[student.id]
+      );
+
+      // Update AsyncStorage and local state
+      await AsyncStorage.setItem(
+        "students_list",
+        JSON.stringify(updatedStudents)
+      );
+      setStudents(updatedStudents); // Update parent state
+      setRemoveStudentModalVisible(false);
     } catch (error) {
-      console.log("error", error);
+      console.error("Error removing students:", error);
     }
   };
 
@@ -43,27 +48,32 @@ const RemoveStudent = ({ visible, setRemoveStudentModalVisible, students }) => {
       <View style={removeStudentModalStyles.overlay}>
         <View style={removeStudentModalStyles.content}>
           <Text style={removeStudentModalStyles.title}>Remove Student</Text>
+
+          {/* Display list of students */}
           {students.map((student) => (
             <View
-              key={student}
+              key={student.id}
               style={removeStudentModalStyles.checkboxContainer}
             >
               <Text style={removeStudentModalStyles.studentName}>
-                {student}
+                {student.student}
               </Text>
               <TouchableOpacity
-                onPress={() => toggleStudentSelection(student)}
+                onPress={() => toggleStudentSelection(student.id)}
                 style={removeStudentModalStyles.checkbox}
               >
                 <Text style={removeStudentModalStyles.checkboxText}>
-                  {selectedStudents[student] ? "☑️" : "⬜️"}
+                  {selectedStudents[student.id] ? "☑️" : "⬜️"}
                 </Text>
               </TouchableOpacity>
             </View>
           ))}
+
+          {/* Buttons */}
           <View style={removeStudentModalStyles.buttonRow}>
             <TouchableOpacity
               style={removeStudentModalStyles.removeButton}
+              onPress={removeSelectedStudents}
             >
               <Text style={removeStudentModalStyles.buttonText}>
                 Remove Selected
@@ -116,7 +126,7 @@ const removeStudentModalStyles = StyleSheet.create({
     color: "#555",
   },
   checkbox: {
-    width: 30, // Fixed width for checkbox area
+    width: 30,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -133,14 +143,14 @@ const removeStudentModalStyles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     flex: 1,
-    marginRight: 10, // Space between buttons
+    marginRight: 10,
   },
   cancelButton: {
     backgroundColor: "#007BFF",
     borderRadius: 5,
     padding: 10,
     flex: 1,
-    marginLeft: 10, // Space between buttons
+    marginLeft: 10,
   },
   buttonText: {
     color: "white",

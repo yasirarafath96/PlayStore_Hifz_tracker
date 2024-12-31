@@ -1,13 +1,34 @@
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const Summary = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     fetchData();
+    console.log("Fetched")
   }, []);
+
+  const CalculateTotalTime = (startDate, endDate) => {
+    if (!startDate || !endDate) {
+      return "Invalid Dates";
+    }
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+  
+    const totalMilliseconds = end - start;
+    if (totalMilliseconds < 0) {
+      return "Invalid Time Range";
+    }
+  
+    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
 
   const fetchData = async () => {
     try {
@@ -20,13 +41,14 @@ const Summary = () => {
           .filter((item) => item.current) 
           .map((item) => ({
             id: item.id,
-            juzz: item.current.currentPara || "N/A", // Use `currentPara` as Juzz
-            startDate: item.current.startDate || "N/A", // Use `startDate` or fallback
-            endDate: "Nil", 
-            totalTime: "Nil",
+            juzz: item.current.currentPara || "N/A", 
+            startDate: item.current.startDate || "N/A", 
+            endDate: item.current.endDate || 'N/A', 
+            totalTime: CalculateTotalTime(item.current.startDate, item.current.endDate) || 'N/A',
           }));
-
+        CalculateTotalTime();
         setData(transformedData);
+        console.log("transformedData", transformedData);
       } else {
         console.log("No data found");
       }
@@ -46,6 +68,9 @@ const Summary = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => fetchData()}>
+        <Text>Retrieve</Text>
+      </TouchableOpacity>
       <View style={styles.tableHeader}>
         <Text style={styles.headerCell}>Juzz</Text>
         <Text style={styles.headerCell}>Start Date</Text>

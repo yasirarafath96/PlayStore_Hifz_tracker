@@ -24,6 +24,7 @@ const UpdateProgram = () => {
   const [overallPercent, setOverallPercent] = useState();
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+  const [paraCompleted, setParaCompleted] = useState([]);
 
   const data = [
     { para: 1, pages: 20 },
@@ -58,61 +59,35 @@ const UpdateProgram = () => {
     { para: 30, pages: 26 },
   ];
 
+  const [filterPage, setFilterPage] = useState();
   const [selectedSurah, setSelectedSurah] = useState(null);
   const [PagesofSelectedSurah, setPagesofSelectedSurah] = useState([]);
-
   const [filterSurah, setFilterSurah] = useState([]);
-  const [filterPage, setFilterPage] = useState();
-
   const totalPages = pages.length;
   const PageDetail = pages[page - 1];
-
-  // console.log("totalPages -> ", totalPages);
-  // console.log("specific page", PageDetail);
-
   const currentPage = Number(page);
-
   const pageSurah = pages.at(page - 1)?.surah;
   const pageStartAyat = pages.at(page - 1)?.ayah;
-
-  // console.log("Surah in Page", pageSurah);
-  // console.log("pageStartAyat", pageStartAyat);
-
   const surahNumber = surah[pageSurah - 1]?.number;
   const surahName = surah[pageSurah - 1]?.englishName;
   const surahAyats = surah[pageSurah - 1]?.numberOfAyahs;
-
-  // console.log("surahNumber", surahNumber);
-  // console.log("surahName", surahName);
-  // console.log("Number of Ayats in Surah", surahAyats);
-
   const nextPage = currentPage + 1;
   const nextPageStartAyat = pages.at(currentPage)?.ayah;
-
-  // console.log("nextPage", nextPage);
-  // console.log("nextPageStartAyat", nextPageStartAyat);
-
   const totalJuzzs = juzzs.length;
   const juzzStartSurah = juzzs[0].surah;
   const juzzStartAyat = juzzs[0].ayah;
 
-  // console.log("totalJuzzs", totalJuzzs);
-  // console.log("juzzStartSurah , juzzStartAyat", juzzStartSurah, juzzStartAyat);
   console.log("filtered Para ----------", filterPara);
-  console.log("page -----------", page);
-  // console.log("Surahinpara", Surahinpara.paras[filterPara]);
-
-  // console.log(
-  //   "Juzz->",
-  //   juzzs.length,
-  //   "  details-> surah",
-  //   juzzs[2].surah,
-  //   "ayat",
-  //   juzzs[2].ayah
-  // );
+  console.log("page -------------------", page);
 
   const handleParaChange = (paraNumber) => {
     setFilterPara(paraNumber);
+    const selectedPara = data.find((para) => para.para === paraNumber);
+    if (selectedPara) {
+      setFilterPage(selectedPara.pages);
+    } else {
+      setFilterPage(null);
+    }
   };
 
   useEffect(() => {
@@ -125,7 +100,7 @@ const UpdateProgram = () => {
 
   const storeData = async (dataObject) => {
     try {
-      const jsonData = JSON.stringify(dataObject); // Convert object to string
+      const jsonData = JSON.stringify(dataObject);
       await AsyncStorage.setItem(`student_${1}`, jsonData);
       console.log("Data saved successfully!");
     } catch (error) {
@@ -138,7 +113,7 @@ const UpdateProgram = () => {
       const jsonData = await AsyncStorage.getItem(`student_${1}`);
       if (jsonData) {
         const dataObject = JSON.parse(jsonData);
-        // console.log("Retrieved data:", dataObject);
+        console.log("Retrieved data:", dataObject);
         return dataObject;
       } else {
         console.log("No data found");
@@ -158,10 +133,21 @@ const UpdateProgram = () => {
 
   const loadData = async () => {
     const data = await getData();
-    console.log("Loaded Data:", data);
+    // console.log("Loaded Data:", data);
   };
 
-  // console.log("pages is para", data.at(filterPara).pages)
+  const CompletedPara = (now) => {
+    const totalPagesInPara = data[filterPara - 1]?.pages;
+    if (page == totalPagesInPara) {
+      console.log("Para completed", filterPara);
+      // const now = moment().format("YYYY-MM-DD HH:mm:ss");
+      console.log("end date", now);
+      setParaCompleted((prev) => [...prev, filterPara]);
+      setEndDate(now);
+    } else {
+      console.log("Para not completed");
+    }
+  };
 
   const calculatePercentage = () => {
     const currentParaData = data[filterPara - 1];
@@ -197,46 +183,52 @@ const UpdateProgram = () => {
   const AddPage = () => {
     const now = moment().format("YYYY-MM-DD HH:mm:ss");
     setStartDate(now);
+    CompletedPara(now);
     calculatePercentage();
     const dataToSave = [
       {
-        ActiveStudent: '1'
+        ActiveStudent: "1",
       },
       {
-      id: 1,
-      name: "User",
-      current: {
-        currentPara: filterPara,
-        currentParaPages: page,
-        currentParaPercent: paraPercent,
-        startDate: startDate,
-        endDate: endDate,
+        id: 1,
+        name: "User",
+        current: {
+          active: true,
+          currentPara: filterPara,
+          currentParaPages: page,
+          currentParaPercent: paraPercent,
+          startDate: startDate,
+          endDate: endDate,
+        },
+        overAll: {
+          totalParaCompleted: 0,
+          overAllPercent: overallPercent,
+        },
       },
-      overAll: {
-        totalParaCompleted: 0,
-        overAllPercent: overallPercent
-      }
-    }, {
-      id: 2,
-      name: "Noman",
-      current: {
-        currentPara: filterPara,
-        currentParaPages: page,
-        currentParaPercent: paraPercent,
-        startDate: startDate,
-        endDate: endDate,
+      {
+        id: 2,
+        name: "Noman",
+        current: {
+          active: false,
+          currentPara: filterPara,
+          currentParaPages: page,
+          currentParaPercent: paraPercent,
+          startDate: startDate,
+          endDate: endDate,
+        },
+        overAll: {
+          totalParaCompleted: 0,
+          overAllPercent: overallPercent,
+        },
       },
-      overAll: {
-        totalParaCompleted: 0,
-        overAllPercent: overallPercent
-      }
-    }];
+    ];
     saveData(dataToSave);
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -264,7 +256,7 @@ const UpdateProgram = () => {
               );
             })}
           </Picker>
-          {/* <Text>Para {filterPara} contains {data.at(filterPara).pages}</Text> */}
+          {/* <Text>Para {filterPara} contains {}</Text> */}
 
           {/* <Picker
             selectedValue={selectedSurah}
@@ -368,7 +360,8 @@ const UpdateProgram = () => {
               <Text>Add Pages</Text>
             </Button>
           </View>
-
+          <Text>{`Overall Percentage: ${overallPercent}%`}</Text>
+          <Text>{`Para ${filterPara} Percentage: ${paraPercent}%`}</Text>
           {/* <Text style={styles.label}>
             Page {page} surah : {pageSurah}
           </Text>

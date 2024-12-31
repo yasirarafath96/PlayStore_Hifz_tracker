@@ -54,97 +54,99 @@ export default function Layout() {
   };
   return (
     <>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer>
-          <Drawer.Screen
-            name="index"
-            options={{
-              drawerLabel: "Dashboard",
-              headerShown: true,
-              title: "Dashboard",
-              drawerIcon: () => (
-                <AntDesign name="home" size={24} color="black" />
-              ),
-              headerRight: () => (
-                <TouchableOpacity
-                  style={{ marginRight: 15 }}
-                  onPress={() => setProfileModal(true)}
-                >
-                  <Avatar bg="green800" rounded="sm" size={32}>
-                    <Icon name="user" color="white" fontFamily="Feather" />
-                  </Avatar>
-                </TouchableOpacity>
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="updateProgram"
-            options={{
-              drawerLabel: "Update Program",
-              headerShown: true,
-              title: "Update Program",
-              drawerIcon: () => (
-                <MaterialIcons name="update" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="updateRevision"
-            options={{
-              drawerLabel: "Update Revision",
-              headerShown: true,
-              title: "Update Revision",
-              drawerIcon: () => (
-                <MaterialIcons name="update" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="summary"
-            options={{
-              drawerLabel: "Summary",
-              headerShown: true,
-              title: "Summary",
-              drawerIcon: () => (
-                <MaterialIcons name="summarize" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="reviewMistakes"
-            options={{
-              drawerLabel: "Review Mistakes",
-              headerShown: true,
-              title: "Review Mistakes",
-              drawerIcon: () => (
-                <MaterialIcons name="reviews" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="resetProgress"
-            options={{
-              drawerLabel: "Reset Progress",
-              headerShown: true,
-              title: "Reset Mistakes",
-              drawerIcon: () => (
-                <MaterialIcons name="reset-tv" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-          <Drawer.Screen
-            name="rateApp"
-            options={{
-              drawerLabel: "Rate App",
-              headerShown: true,
-              title: "Rate App",
-              drawerIcon: () => (
-                <MaterialIcons name="rate-review" size={24} color="black" />
-              ),
-            }}
-          ></Drawer.Screen>
-        </Drawer>
-      </GestureHandlerRootView>
+      <PaperProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Drawer>
+            <Drawer.Screen
+              name="index"
+              options={{
+                drawerLabel: "Dashboard",
+                headerShown: true,
+                title: "Dashboard",
+                drawerIcon: () => (
+                  <AntDesign name="home" size={24} color="black" />
+                ),
+                headerRight: () => (
+                  <TouchableOpacity
+                    style={{ marginRight: 15 }}
+                    onPress={() => setProfileModal(true)}
+                  >
+                    <Avatar bg="green800" rounded="sm" size={32}>
+                      <Icon name="user" color="white" fontFamily="Feather" />
+                    </Avatar>
+                  </TouchableOpacity>
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="updateProgram"
+              options={{
+                drawerLabel: "Update Program",
+                headerShown: true,
+                title: "Update Program",
+                drawerIcon: () => (
+                  <MaterialIcons name="update" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="updateRevision"
+              options={{
+                drawerLabel: "Update Revision",
+                headerShown: true,
+                title: "Update Revision",
+                drawerIcon: () => (
+                  <MaterialIcons name="update" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="summary"
+              options={{
+                drawerLabel: "Summary",
+                headerShown: true,
+                title: "Summary",
+                drawerIcon: () => (
+                  <MaterialIcons name="summarize" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="reviewMistakes"
+              options={{
+                drawerLabel: "Review Mistakes",
+                headerShown: true,
+                title: "Review Mistakes",
+                drawerIcon: () => (
+                  <MaterialIcons name="reviews" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="resetProgress"
+              options={{
+                drawerLabel: "Reset Progress",
+                headerShown: true,
+                title: "Reset Mistakes",
+                drawerIcon: () => (
+                  <MaterialIcons name="reset-tv" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+            <Drawer.Screen
+              name="rateApp"
+              options={{
+                drawerLabel: "Rate App",
+                headerShown: true,
+                title: "Rate App",
+                drawerIcon: () => (
+                  <MaterialIcons name="rate-review" size={24} color="black" />
+                ),
+              }}
+            ></Drawer.Screen>
+          </Drawer>
+        </GestureHandlerRootView>
+      </PaperProvider>
 
       {profileModal && (
         <ProfileModal
