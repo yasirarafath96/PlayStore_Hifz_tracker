@@ -5,16 +5,17 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import DoughnutChart from "../components/atoms/doughnutChart";
 import Feather from "@expo/vector-icons/Feather";
 import BarGraph from "../components/atoms/barGraph";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Modal } from "react-native-paper";
+import { Button, Modal } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import juzzs from "../../constants/juzzs.json";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Pie, PolarChart } from "victory-native";
+import BarChart from "../components/charts/barChart";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const [overallPercent, setOverallPercent] = useState(0);
   const [currentPercent, setCurrentPercent] = useState(0);
   const [filterPara, setFilterPara] = useState();
+  const [showGraph, setShowGraph] = useState(true);
 
   useEffect(() => {
     getData();
@@ -92,84 +94,25 @@ const Dashboard = () => {
     ];
   }, [currentPercent]);
 
-  const customProgress = [
-    20,
-    30,
-    80,
-    85,
-    0, // Keep the first 20%
-    0,
-    0,
-    0,
-    0,
-    0, // Fill in with zeros
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0, // Fill in more zeros to reach a total of 30
-    0,
-    0,
-    0,
-    0, // More zeros
-    0,
-    0,
-    0,
-    0, // Fill in more zeros to reach the end
-    0,
-    30,
-    0,
-    0,
-    10,
-    10, // Keep the last 30% value and rest as zeros
-  ];
-  function randomNumber() {
-    return Math.floor(Math.random() * 26) + 125;
-  }
-  function generateRandomColor() {
-    const randomColor = Math.floor(Math.random() * 0xffffff).toString(16);
-    return `#${randomColor.padStart(6, "0")}`;
-  }
-  const DATA = (numberPoints = 5) =>
-    Array.from({ length: numberPoints }, (_, index) => ({
-      value: randomNumber(),
-      color: generateRandomColor(),
-      label: `Label ${index + 1}`,
-    }));
   return (
     <>
       <View style={styles.container}>
-        <View style={{ height: 300 }}>
-          <PolarChart
-            data={DATA()}
-            labelKey={"label"}
-            valueKey={"value"} 
-            colorKey={"color"} 
-          >
-            <Pie.Chart />
-          </PolarChart>
-        </View>
-        <TouchableOpacity onPress={() => getData()}>
+        {/* <TouchableOpacity onPress={() => getData()}>
           <Text>Retreve</Text>
-        </TouchableOpacity>
-        <View style={styles.chartContainer}>
+        </TouchableOpacity> */}
+        {/* <View style={styles.chartContainer}>
           <View style={styles.chartWrapper}>
-            <Text style={styles.chartHeaderText}>Overall Hifz</Text>
             <DoughnutChart data={overallHifz} />
           </View>
           <View style={styles.chartWrapper}>
-            <Text style={styles.chartHeaderText}>Current Juzz</Text>
             <DoughnutChart data={currentJuzz} />
             <Text style={styles.completionText}>
               {currentPercent === 100 ? "Completed!" : `${currentPercent}%`}
             </Text>
           </View>
-        </View>
+        </View> */}
 
-        <View style={styles.percentageContainer}>
+        {/* <View style={styles.percentageContainer}>
           <View style={styles.percentageItem}>
             <Text style={styles.percentageText}>{overallHifz[0].value}%</Text>
           </View>
@@ -181,13 +124,8 @@ const Dashboard = () => {
               <Feather name="edit" size={20} color="black" />
             </TouchableOpacity>
           </View>
-        </View>
-        {/* <View style={styles.progressContainer}>
-          <Text style={styles.progressHeader}>Para Progress</Text>
-        </View>
-        <View style={styles.barGraphContainer}>
-          <BarGraph progress={customProgress} />
         </View> */}
+        {showGraph && <BarChart />}
       </View>
 
       <Modal visible={visibleModal}>
@@ -250,20 +188,24 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   chartContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     width: "100%",
     paddingHorizontal: 10,
+    backgroundColor: "green",
+    height: "60%",
   },
   chartWrapper: {
-    width: "48%",
+    width: "95%",
     backgroundColor: "lightgrey",
     padding: 10,
     borderRadius: 10,
-    height: 240,
+    height: "50%",
     justifyContent: "flex-start",
     alignItems: "flex-start",
     elevation: 10,
+    marginTop: 10,
   },
   chartHeaderText: {
     fontSize: 20,
@@ -276,6 +218,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: "100%",
     paddingHorizontal: 10,
+    marginBottom: 30,
   },
   percentageItem: {
     width: "50%",
