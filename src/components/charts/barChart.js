@@ -22,7 +22,7 @@ const DATA = function (length = 10) {
 const BarChart = () => {
   const [data, setData] = useState([
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 1 },
-    { listenCount: Math.floor(Math.random() * 30) + 1, month: 2 },
+    { listenCount: 25, month: 2 },
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 3 },
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 4 },
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 5 },

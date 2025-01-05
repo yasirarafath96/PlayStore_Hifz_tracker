@@ -16,6 +16,7 @@ import { Picker } from "@react-native-picker/picker";
 import juzzs from "../../constants/juzzs.json";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import BarChart from "../components/charts/barChart";
+import PieChart from "../components/charts/pieChart";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [currentPercent, setCurrentPercent] = useState(0);
   const [filterPara, setFilterPara] = useState();
   const [showGraph, setShowGraph] = useState(true);
+  const [showPie, setShowPie] = useState(true);
 
   useEffect(() => {
     getData();
@@ -96,11 +98,11 @@ const Dashboard = () => {
 
   return (
     <>
-      <View style={styles.container}>
-        {/* <TouchableOpacity onPress={() => getData()}>
+        <View style={styles.container}>
+          {/* <TouchableOpacity onPress={() => getData()}>
           <Text>Retreve</Text>
         </TouchableOpacity> */}
-        {/* <View style={styles.chartContainer}>
+          {/* <View style={styles.chartContainer}>
           <View style={styles.chartWrapper}>
             <DoughnutChart data={overallHifz} />
           </View>
@@ -112,7 +114,7 @@ const Dashboard = () => {
           </View>
         </View> */}
 
-        {/* <View style={styles.percentageContainer}>
+          {/* <View style={styles.percentageContainer}>
           <View style={styles.percentageItem}>
             <Text style={styles.percentageText}>{overallHifz[0].value}%</Text>
           </View>
@@ -125,8 +127,11 @@ const Dashboard = () => {
             </TouchableOpacity>
           </View>
         </View> */}
-        {showGraph && <BarChart />}
-      </View>
+          {showPie && <PieChart />}
+          {/* {showPie && <PieChart />} */}
+          {showGraph && <BarChart />}
+          
+        </View>
 
       <Modal visible={visibleModal}>
         <>
