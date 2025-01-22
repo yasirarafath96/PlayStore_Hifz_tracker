@@ -16,6 +16,8 @@ import Surahinpara from "../../constants/SurahInPara.json";
 import { Button, TextInput } from "react-native-paper";
 import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import poppinsMedium from "../../assets/fonts/Poppins/Poppins-Medium.ttf";
+import { useFont } from "@shopify/react-native-skia";
 
 const UpdateProgram = () => {
   const [page, setPage] = useState();
@@ -25,6 +27,7 @@ const UpdateProgram = () => {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [paraCompleted, setParaCompleted] = useState([]);
+  const fontMedium = useFont(poppinsMedium, 12);
 
   const data = [
     { para: 1, pages: 20 },
@@ -233,12 +236,19 @@ const UpdateProgram = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.inputContainer}>
-          <TouchableOpacity onPress={() => saveData()}>
+          {/* <TouchableOpacity onPress={() => saveData()}>
             <Text>Store</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => loadData()}>
             <Text>Retrieve</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <Text
+            style={{
+              fontSize: 18, color: "black", fontWeight: 500, paddingVertical: 8
+            }}
+          >
+            Select Para
+          </Text>
           <Picker
             selectedValue={filterPara}
             onValueChange={(para) => handleParaChange(para)}
@@ -256,80 +266,22 @@ const UpdateProgram = () => {
               );
             })}
           </Picker>
-          {/* <Text>Para {filterPara} contains {}</Text> */}
-
-          {/* <Picker
-            selectedValue={selectedSurah}
-            onValueChange={(surah) => setSelectedSurah(surah)}
-            style={styles.picker}
-          >
-            {filterSurah.map((surah) => (
-              <Picker.Item
-                key={surah.number}
-                label={surah.name}
-                value={surah.number}
-              />
-            ))}
-          </Picker>
-
-          <Picker
-            selectedValue={page}
-            onValueChange={(itemValue) => setPage(itemValue)}
-            style={styles.picker}
-          >
-            {PagesofSelectedSurah.map((pageData, index) => (
-              <Picker.Item
-                key={index}
-                label={pageData.description}
-                value={pageData.pageNumber}
-              />
-            ))}
-          </Picker> */}
-
-          {/* {selectedSurah !== null && (
-            <View style={styles.selectionContainer}>
-              <Text style={styles.selectedText}>
-                Selected Surah:{"  "}
-                <Text style={styles.bold}>
-                  {surah.find((s) => s.number === selectedSurah)?.englishName ||
-                    "Unknown"}
-                </Text>
-              </Text>
-            </View>
-          )} */}
-
-          <View
+        
+          <Text style={{ fontSize: 18, color: "black", fontWeight: 500, paddingVertical: 8, marginTop: 6 }}>
+            Enter Pages 
+          </Text>
+          <TextInput
+            onChangeText={(text) => setPage(text)} // Update state with user input
+            value={page?.toString() || ""} // Convert `page` to string for display
+            keyboardType="numeric"
             style={{
-              width: "50%",
-              backgroundColor: "#ACC8E5",
-              paddingBottom: 10,
-              marginTop: 10,
-              paddingHorizontal: 10,
-              paddingTop: 10,
+              backgroundColor: "white",
+              color: "black",
+              marginVertical: 10,
+              borderColor: '#ACC8E5',
+              borderWidth: 1,
             }}
-          >
-            <Text style={{ fontSize: 15, color: "black", fontWeight: 500 }}>
-              Enter Pages:{" "}
-            </Text>
-            <TextInput
-              onChangeText={(text) => setPage(text)} // Update state with user input
-              value={page?.toString() || ""} // Convert `page` to string for display
-              keyboardType="numeric"
-              style={{
-                backgroundColor: "white",
-                color: "black",
-                marginVertical: 10,
-              }}
-            />
-          </View>
-
-          {page !== null && (
-            <View style={styles.selectionContainer}>
-              <Text style={styles.selectedText}>
-                Selected Pages: <Text style={styles.bold}>{page}</Text>
-              </Text>
-            </View>
-          )}
+          />
           {filterPara !== null && (
             <View style={styles.selectionContainer}>
               <Text style={styles.selectedText}>
@@ -338,6 +290,14 @@ const UpdateProgram = () => {
               </Text>
             </View>
           )}
+          {page !== null && (
+            <View style={styles.selectionContainer}>
+              <Text style={styles.selectedText}>
+                Selected Pages: <Text style={styles.bold}>{page}</Text>
+              </Text>
+            </View>
+          )}
+          
 
           <View
             style={{
@@ -418,7 +378,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-    width: "50%",
+    width: "100%",
     backgroundColor: "#ACC8E5",
     marginTop: 5,
     borderColor: "black",
@@ -432,10 +392,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 5,
     elevation: 2,
-    width: "60%",
+    width: "100%",
   },
   selectedText: {
-    fontSize: 14,
+    fontSize: 16,
   },
   bold: {
     fontWeight: "bold",

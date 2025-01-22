@@ -1,45 +1,109 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native';
-import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ReviewMistakes = () => {
-  // Sample data for the table
-  const data = [
-    { juzz: '1', surah: 'Al-Fatiha', pageNumber: 1, mistakes: 2 },
-    { juzz: '2', surah: 'Al-Baqarah', pageNumber: 2, mistakes: 3 },
-    { juzz: '3', surah: 'Al-Imran', pageNumber: 3, mistakes: 1 },
-    { juzz: '4', surah: 'An-Nisa', pageNumber: 4, mistakes: 0 },
-    { juzz: '5', surah: 'Al-Ma\'idah', pageNumber: 5, mistakes: 4 },
-    // Add more data as needed
-  ];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefresing] = useState(false);
 
-  // Filter out entries with 0 mistakes and sort by mistakes in descending order
-  const filteredData = data
-    .filter(item => item.mistakes > 0)
-    .sort((a, b) => b.mistakes - a.mistakes);
+  useEffect(() => {
+    GetRevision();
+  }, []);
+
+  const GetRevision = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://192.168.31.181:5000/api/revision"
+      );
+      if (response.status == 200) {
+        console.log("response", response.status);
+        setData(response.data.data);
+      }
+    } catch (error) {
+      console.log("error get revison", error);
+    }
+    setLoading(false);
+  };
+
+  const filteredData = data.filter((item) => item.mistakes >= 1);
+  const sortedData = filteredData.sort((a, b) => b.mistakes - a.mistakes);
+  console.log("data", sortedData);
 
   const renderItem = ({ item }) => (
-    <View style={styles.tableRow}>
+    <View style={styles.tableRow} key={item._id}>
       <Text style={styles.tableCell}>{item.juzz}</Text>
-      <Text style={styles.tableCell}>{item.surah}</Text>
-      <Text style={styles.tableCell}>{item.pageNumber}</Text>
-      <Text style={styles.tableCell}>{item.mistakes}</Text>
+      <Text style={styles.tableCell}>{item.surahName}</Text>
+      <Text style={styles.tableCell}>{item.page}</Text>
+      <Text
+        style={[
+          styles.tableCell,
+          {
+            color:
+              item.mistakes == 3
+                ? "red"
+                : item.mistakes == 2
+                ? "orange"
+                : "green",
+          },
+        ]}
+      >
+        {item.mistakes}
+      </Text>
     </View>
   );
 
+  const OnRefresh = async () => {
+    setRefresing(true);
+    try {
+      const response = await axios.get(
+        "http://192.168.31.181:5000/api/revision"
+      );
+      if (response.status === 200) {
+        setData(response.data.data);
+      }
+    } catch (error) {
+      console.log("Error refreshing data:", error);
+    } finally {
+      setRefresing(false);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.tableHeader}>
-        <Text style={styles.headerCell}>Juzz</Text>
-        <Text style={styles.headerCell}>Surah</Text>
-        <Text style={styles.headerCell}>Page Number</Text>
-        <Text style={styles.headerCell}>Mistakes</Text>
-      </View>
-      <FlatList
-        data={filteredData}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.juzz}
-      />
-    </View>
+    <>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          style={{ flex: 1, justifyContent: "center" }}
+        />
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.headerCell}>Juzz</Text>
+            <Text style={styles.headerCell}>Surah</Text>
+            <Text style={styles.headerCell}>Page Number</Text>
+            <Text style={styles.headerCell}>Mistakes</Text>
+          </View>
+          <FlatList
+            data={filteredData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id.toString()}
+            ListEmptyComponent={<Text>No data available</Text>}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={OnRefresh} />
+            }
+          />
+        </View>
+      )}
+    </>
   );
 };
 
@@ -49,30 +113,31 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
+    flexDirection: "row",
+    backgroundColor: "#f0f0f0",
     paddingVertical: 10,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: 'black',
+    borderBottomColor: "black",
+    marginTop: 10,
   },
   headerCell: {
     flex: 1,
-    textAlign: 'center',
-    fontWeight: 'bold',
+    textAlign: "center",
+    fontWeight: "bold",
   },
   tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
   },
   tableCell: {
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

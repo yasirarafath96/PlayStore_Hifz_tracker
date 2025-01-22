@@ -11,24 +11,18 @@ const PieChart = () => {
   function generateRandomColor() {
     // Generating a random number between 0 and 0xFFFFFF
     const randomColor = Math.floor(Math.random() * 0xffffff);
-    // Converting the number to a hexadecimal string and padding with zeros
     return `#${randomColor.toString(16).padStart(6, "0")}`;
   }
 
   const data = [
     {
-      value: 10,
-      color: 'green',
+      value: 30,
+      color: "green",
       label: "Completed",
     },
     {
-      value: 30,
-      color: 'grey',
-      label: "Incomplete",
-    },
-    {
-      value: 40,
-      color: 'grey',
+      value: 70,
+      color: "lightgrey",
       label: "Incomplete",
     },
   ];
@@ -36,12 +30,11 @@ const PieChart = () => {
   return (
     <>
       <Box
-        width="100%"
+        width="95%"
         height="40%"
-        paddingHorizontal={5}
+        paddingHorizontal={10}
         paddingVertical={30}
         backgroundColor="white"
-        
       >
         <Box
           elevation={10}
@@ -51,31 +44,27 @@ const PieChart = () => {
           width="100%"
           backgroundColor="white"
         >
-          <Box width="100%" backgroundColor="white" height="70%">
+          <Box
+            width="100%"
+            backgroundColor="white"
+            height="75%"
+            alignItems="center"
+          >
             <PolarChart
               data={data}
               colorKey={"color"}
               valueKey={"value"}
               labelKey={"label"}
-              
             >
-              <Pie.Chart
-                startAngle={0}
-                innerRadius={20}
-                
-              >
+              <Pie.Chart startAngle={0} innerRadius={20}>
                 {() => {
                   return (
                     <>
-                      <Pie.Slice 
-                      animate={{
-                        duration: 1000,
-                        easing: "easeInOut", 
-                      }}
-                    //   antiAlias={true}
-                    // end={10}
-                    // invertClip={true}
-                    
+                      <Pie.Slice
+                        animate={{
+                          duration: 1000,
+                          easing: "easeInOut",
+                        }}
                       />
                     </>
                   );
@@ -86,7 +75,7 @@ const PieChart = () => {
           <Box
             width="100%"
             backgroundColor="white"
-            height="30%"
+            height="25%"
             alignItems="flex-end"
           >
             {data.map((val, index) => {

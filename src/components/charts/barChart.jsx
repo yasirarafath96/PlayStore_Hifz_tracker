@@ -1,4 +1,5 @@
 import {
+  Easing,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -6,7 +7,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Box, Button, ButtonText } from "@gluestack-ui/themed";
-import { Bar, CartesianChart, useChartPressState } from "victory-native";
+import { Bar, CartesianChart, useChartPressState, useChartTransformState } from "victory-native";
 import { LinearGradient, useFont, vec, Text as SKText } from "@shopify/react-native-skia";
 import inter from "../../../assets/fonts/Poppins/Poppins-Bold.ttf";
 import { useDerivedValue } from "react-native-reanimated";
@@ -22,12 +23,10 @@ const DATA = function (length = 10) {
 const BarChart = () => {
   const [data, setData] = useState([
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 1 },
-    { listenCount: 25, month: 2 },
     { listenCount: Math.floor(Math.random() * 30) + 1, month: 3 },
-    { listenCount: Math.floor(Math.random() * 30) + 1, month: 4 },
-    { listenCount: Math.floor(Math.random() * 30) + 1, month: 5 },
-    { listenCount: Math.floor(Math.random() * 30) + 1, month: 6 },
-    { listenCount: Math.floor(Math.random() * 30) + 1, month: 7 },
+  { listenCount: Math.floor(Math.random() * 30) + 1, month: 3 },
+  { listenCount: Math.floor(Math.random() * 30) + 1, month: 4 },
+  { listenCount: Math.floor(Math.random() * 30) + 1, month: 5 },
   ]);
   const font = useFont(inter, 10);
   const toolTipFont = useFont(inter, 5);
@@ -39,22 +38,27 @@ const BarChart = () => {
   const value = useDerivedValue(() => {
     return "$" + state.y.listenCount.value.value;
   }, [state]);
+
   const textYposition = useDerivedValue(() => {
-    return state.y.listenCount.position.value - 10;
-  }, [state]);
+    return state.y.listenCount.position.value - 15;
+  }, [value]);
+
   const textXposition = useDerivedValue(() => {
     if(!font){
         return 0;
     }
     return (
-        state.x.position.value -
-      toolTipFont.measureText(value.value).width / 2
+      state.x.position.value - toolTipFont.measureText(value.value).width / 2
     );
-  }, [state, toolTipFont]);
+  }, [value, toolTipFont]);
 
   useEffect(() => {}, []);
 
   console.log(data);
+  console.log("Circle Props", {
+    cx: state.x.position.value,
+    cy: state.y.listenCount.position.value,
+  });
   return (
     <>
       <Box flex={1} width="100%" backgroundColor="white" paddingHorizontal={5}>
@@ -70,12 +74,12 @@ const BarChart = () => {
             chartPressState={state}
             xKey="month"
             yKeys={["listenCount"]}
-            padding={5}
+            padding={2}
             domain={{ y: [0, 100] }}
             domainPadding={{ left: 50, right: 50, top: 30 }}
             axisOptions={{
               font,
-              tickCount: 7,
+              tickCount: 6,
               labelColor: "black",
               lineColor: "black",
               formatXLabel: (value) => {
@@ -96,6 +100,13 @@ const BarChart = () => {
                       topRight: 10,
                       topLeft: 10,
                     }}
+                    barCount={6}
+                    labels={{
+                      position: 'top',
+                      font: font,
+                      color: 'black'
+                    }}
+                    innerPadding={0.2}
                   >
                     <LinearGradient
                       start={vec(0, 0)}
@@ -103,7 +114,7 @@ const BarChart = () => {
                       colors={["green", "lightgrey"]}
                     />
                   </Bar>
-                  {isActive ?
+                  {/* {isActive ?
                     <>
                         <SKText
                             font={toolTipFont}
@@ -116,11 +127,11 @@ const BarChart = () => {
                             cx={state.x.position}
                             cy={state.y.listenCount.position}
                             r={8}
-                            color={'grey'}
+                            color={"black"}
                             opacity={0.8}
                         />
                     </>
-                  : null}
+                  : null} */}
                 </>
               );
             }}

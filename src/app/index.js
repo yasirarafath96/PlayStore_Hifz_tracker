@@ -98,11 +98,11 @@ const Dashboard = () => {
 
   return (
     <>
-        <View style={styles.container}>
-          {/* <TouchableOpacity onPress={() => getData()}>
+      <View style={styles.container}>
+        {/* <TouchableOpacity onPress={() => getData()}>
           <Text>Retreve</Text>
         </TouchableOpacity> */}
-          {/* <View style={styles.chartContainer}>
+        {/* <View style={styles.chartContainer}>
           <View style={styles.chartWrapper}>
             <DoughnutChart data={overallHifz} />
           </View>
@@ -114,7 +114,7 @@ const Dashboard = () => {
           </View>
         </View> */}
 
-          {/* <View style={styles.percentageContainer}>
+        {/* <View style={styles.percentageContainer}>
           <View style={styles.percentageItem}>
             <Text style={styles.percentageText}>{overallHifz[0].value}%</Text>
           </View>
@@ -127,11 +127,11 @@ const Dashboard = () => {
             </TouchableOpacity>
           </View>
         </View> */}
-          {showPie && <PieChart />}
-          {/* {showPie && <PieChart />} */}
-          {showGraph && <BarChart />}
-          
-        </View>
+        {showPie && <PieChart />}
+        {/* {showPie && <PieChart />} */}
+        {/* {showGraph && <BarChart />} */}
+        
+      </View>
 
       <Modal visible={visibleModal}>
         <>
